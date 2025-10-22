@@ -5,7 +5,7 @@ export const useAuthenticate = (dispatch) => {
 
     const login = async ({ email, password }) => {
 
-        const { ok, uid, photoURL, displayName, errorMessage } = await loginUser(email, password)
+        const { ok, uid, displayName, errorMessage } = await loginUser(email, password)
 
         if (!ok) {
             const action = {
@@ -17,7 +17,7 @@ export const useAuthenticate = (dispatch) => {
             return false;
         }
 
-        const userPayload = { email, uid, displayName, photoURL }
+        const userPayload = { email, uid, displayName }
 
         const action = {
             type: authTypes.login,
