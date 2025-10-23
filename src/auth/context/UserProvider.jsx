@@ -6,7 +6,7 @@ import { useAuthenticate } from "../hooks/useAuthenticate";
 const authInitialState = {
   logged: false,
   user: null, 
-  errorMessage: null
+  errorMessage: null,
 }
 
 const init = () =>{

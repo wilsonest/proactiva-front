@@ -5,7 +5,8 @@ const mockUsers = [
         uid: '1',
         email: 'test@example.com',
         password: '123456',
-        displayName: 'Test User',
+        displayName: 'Wilson Estrada',
+        rol: 'teacher'
     },
 ];
 

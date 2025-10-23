@@ -132,13 +132,6 @@ function Title() {
   return <h2 style={{ marginBottom: 8 }}>Login</h2>;
 }
 
-// function Subtitle() {
-//   return (
-//     <Alert sx={{ mb: 2, px: 1, py: 0.25, width: '100%' }} severity="warning">
-//       We are investigating an ongoing outage.
-//     </Alert>
-//   );
-// }
 
 function RememberMeCheckbox() {
   const theme = useTheme();

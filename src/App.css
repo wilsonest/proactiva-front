@@ -42,7 +42,15 @@
 }
 
 
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #e6f7ec; /* color de respaldo si la imagen no carga */
+}
+
 body {
+  overflow: hidden;
   background-image: url("./images/imagenTDEA.png"); /* ruta de la imagen */
   background-size: cover;       /* hace que cubra toda la pantalla */
   background-position: center;  /* centra la imagen */
