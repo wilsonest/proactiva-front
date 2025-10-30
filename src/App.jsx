@@ -1,15 +1,27 @@
-import { UserProvider } from "./auth/context/UserProvider";
-import StudenPage from "./dashboards/pages/StudenPage";
-import { AppRouter } from "./routes/AppRouter";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 
-
-export const App = () => {
-
+function App() {
   return (
-    <>
-      <UserProvider>
-        <AppRouter />   
-      </UserProvider>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
-};
+}
+
+export default App;
