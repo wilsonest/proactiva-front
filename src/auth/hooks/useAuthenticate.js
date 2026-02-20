@@ -1,12 +1,12 @@
 import { authTypes } from "../types/authTypes"
-import { loginUser, signUpWithEmailAndPassword, getUserInfo } from "../providers/provider"
+import { loginUser, signUp, getUserInfo } from "../../api/provider";
 
 export const useAuthenticate = (dispatch) => {
 
     const login = async ({ email, password }) => {
 
-        const { ok, uid, displayName, errorMessage, rol } = await loginUser(email, password)
-
+        // const {ok,usuario: { id, nombre_usuario, correo_electronico, rol } = {},errorMessage} = await loginUser(email, password);
+        const {ok, access_token, token_type, tiempo_expiracion, errorMessage} = await loginUser(email, password);
         if (!ok) {
             const action = {
                 type: authTypes.errors,
@@ -17,13 +17,13 @@ export const useAuthenticate = (dispatch) => {
             return false;
         }
 
-        const userPayload = { email, uid, displayName, rol }
+        const tokenPayload = { access_token }
 
         const action = {
             type: authTypes.login,
-            payload: userPayload,
+            payload: tokenPayload,
         };
-        const userInfo = await getUserInfo(userPayload, false);
+        const userInfo = await getUserInfo(tokenPayload, false);
         localStorage.setItem('user', JSON.stringify(userInfo));
         dispatch(action);
 
@@ -40,7 +40,7 @@ export const useAuthenticate = (dispatch) => {
     }
 
     const signUpWithEmail = async ({ email, password, country, fullname }) => {
-        const { ok, errorMessage, uid } = await signUpWithEmailAndPassword({ email, password })
+        const { ok, errorMessage, uid } = await signUp({ email, password })
         if (!ok) {
             sendErrorAction(errorMessage)
             return false;

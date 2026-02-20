@@ -14,20 +14,20 @@ import { useTheme } from '@mui/material/styles';
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
 
 
-const onLoginUser = async (email, password, provider) => {
-  setErrorMessage("");
-  let isLogged = false;
+// const onLoginUser = async (email, password, provider) => {
+//   setErrorMessage("");
+//   let isLogged = false;
 
-  if (provider === "Email and Password") {
-    isLogged = await login({ email, password });
-  }
+//   if (provider === "Email and Password") {
+//     isLogged = await login({ email, password });
+//   }
 
-  if (!isLogged) {
-    setErrorMessage("An error has occurred: " + errorMessage);
-  } else {
-    navigate("/", { replace: true });
-  }
-};
+//   if (!isLogged) {
+//     setErrorMessage("An error has occurred: " + errorMessage);
+//   } else {
+//     navigate("/", { replace: true });
+//   }
+// };
 
 
 function CustomEmailField() {
@@ -164,7 +164,6 @@ export function LoginPage() {
 
   const providers = [{ id: "credentials", name: "Email and Password" }];
 
-  // 🔥 Función de login definida dentro del componente
   const onLoginUser = async (email, password, provider) => {
     setErrorMessage("");
     let isLogged = false;

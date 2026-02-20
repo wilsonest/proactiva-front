@@ -23,7 +23,7 @@ export const AppRouter = () => {
       </>
     );
   }
-  if (rol == 'student') {
+  if (rol == 'estudiante') {
     return (
       <>
         <Routes>
@@ -39,7 +39,7 @@ export const AppRouter = () => {
 
   }
 
-  if (rol == 'teacher') {
+  if (rol == 'profesor') {
     return (
       <>
         <Routes>
@@ -56,7 +56,7 @@ export const AppRouter = () => {
     );
   }
 
-  if (rol == 'admin') {
+  if (rol == 'coordinador') {
     return (
       <>
         <Routes>
