@@ -5,11 +5,11 @@ import { UserContext } from "../auth/context/UserContext";
 import { useContext } from "react";
 import StudenPage from "../dashboards/pages/StudenPage";
 import TeacherPage from "../dashboards/pages/TeacherPage";
-import DashboardLayout from "../dashboards/components/DashboardLayout";
+import CoordinadorPage from "../dashboards/pages/CoordinadorPage";
+import ListaEstudiante from "../Listas/pages/ListaEstudiante";
 
 
 export const AppRouter = () => {
-  console.log("AppRouter rendered");
   const { userState: { logged, user } } = useContext(UserContext);
   const rol = user?.rol;
 
@@ -27,12 +27,9 @@ export const AppRouter = () => {
     return (
       <>
         <Routes>
-          <Route path="/" element={
-            <DashboardLayout>
-              <StudenPage />
-            </DashboardLayout>
-            } />
+          <Route path="/" element={ <StudenPage /> } />
           <Route path="/*" element={<Navigate to="/" />} />
+          <Route path="/ListaEstudiante" element={<ListaEstudiante />} />
         </Routes>
       </>
     );
@@ -43,13 +40,7 @@ export const AppRouter = () => {
     return (
       <>
         <Routes>
-          <Route path="/" element={
-
-            <DashboardLayout>
-              <TeacherPage />
-            </DashboardLayout>
-             
-             } />
+          <Route path="/" element={<TeacherPage /> } />
           <Route path="/*" element={<Navigate to="/" />} />
         </Routes>
       </>
@@ -60,35 +51,11 @@ export const AppRouter = () => {
     return (
       <>
         <Routes>
-          <Route path="/" element={<StudenPage />} />
+          <Route path="/" element={<CoordinadorPage />} />
           <Route path="/*" element={<Navigate to="/" />} />
         </Routes>
       </>
     );
 
   }
-
-  //  if (rol === "teacher") {
-  //   return (
-  //     <Routes>
-  //       <Route
-  //         path="/" element={
-  //           <DashboardLayout>
-  //             <TeacherPage />
-  //           </DashboardLayout>
-  //         }
-  //       />
-  //       <Route path="/*" element={<Navigate to="/" />} />
-  //     </Routes>
-  //   );
-  // }
-  // return (
-  //   <>
-  //     <Routes>
-  //       <Route path="/" element={<StudenPage />} />
-  //       {/* <Route path="/*" element={<Navigate to="/" />} />
-  //       <Route path="/callback" element={<SpotifyCallbackPage />} /> */}
-  //     </Routes>
-  //   </>
-  // );
 };

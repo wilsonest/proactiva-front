@@ -6,7 +6,7 @@ export const useAuthenticate = (dispatch) => {
     const login = async ({ email, password }) => {
 
         // const {ok,usuario: { id, nombre_usuario, correo_electronico, rol } = {},errorMessage} = await loginUser(email, password);
-        const {ok, access_token, token_type, tiempo_expiracion, errorMessage} = await loginUser(email, password);
+        const {ok, access_token, errorMessage} = await loginUser(email, password);
         if (!ok) {
             const action = {
                 type: authTypes.errors,
@@ -17,14 +17,13 @@ export const useAuthenticate = (dispatch) => {
             return false;
         }
 
-        const tokenPayload = { access_token }
+        const userInfo = await getUserInfo(access_token);
+        localStorage.setItem('user', JSON.stringify(userInfo));
 
         const action = {
             type: authTypes.login,
-            payload: tokenPayload,
+            payload: userInfo,
         };
-        const userInfo = await getUserInfo(tokenPayload, false);
-        localStorage.setItem('user', JSON.stringify(userInfo));
         dispatch(action);
 
         return true;
@@ -39,25 +38,13 @@ export const useAuthenticate = (dispatch) => {
 
     }
 
-    const signUpWithEmail = async ({ email, password, country, fullname }) => {
-        const { ok, errorMessage, uid } = await signUp({ email, password })
-        if (!ok) {
-            sendErrorAction(errorMessage)
-            return false;
-        }
+    const signUpWithEmail = async (data) => {
+        const response = await signUp(data)
 
-        const userPayload = {
-            uid: uid,
-            country: country,
-            displayName: fullname,
-            rol: rol
-        }
         const action = {
-            type: authTypes.login,
-            payload: userPayload,
-        };
-        const userInfo = await getUserInfo(userPayload, false);
-        localStorage.setItem('user', JSON.stringify(userInfo));
+            type: authTypes.signUp,
+            payload: response,
+        }
 
         dispatch(action)
 

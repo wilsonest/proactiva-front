@@ -25,8 +25,8 @@ export const authReducer = (state = {}, action = {}) => {
             };
         case authTypes.signUp:
             return {
+                ...state,
                 logged: false,
-                user: {},
                 errorMessage: null
             };
         default:

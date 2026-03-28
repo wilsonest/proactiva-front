@@ -2,7 +2,6 @@ import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import React, { useContext, useEffect, useState } from "react";
-// Cambio: Importar Snackbar y Alert de Material UI
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import CreateCaseModal from "../components/CreateCaseModal";
@@ -45,7 +44,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   }),
 );
 
-export default function TeacherPage() {
+export default function CoordinadorPage() {
   const [openEstudiantes, setOpenEstudiantes] = React.useState(false);
   const [openCasos, setOpenCasos] = React.useState(false);
   const [cases, setCases] = useState([]);
@@ -57,7 +56,6 @@ export default function TeacherPage() {
   const [openViewModal, setOpenViewModal] = useState(false);
   const [successAlert, setSuccessAlert] = useState(false);
   const [messageAlert, setMessageAlert] = useState("");
-
   const { logout } = useContext(UserContext);
   const { getAllCases, createCases, updateCase, getCaseById, deleteCase, createRubrica, getRyCbyId, updateRubrica } = useContext(CasesContext);
 
@@ -65,14 +63,9 @@ export default function TeacherPage() {
 
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/Login", { replace: true });
-  };
+  const handleLogout = () => { logout(); navigate("/Login", { replace: true });};
 
-  const handleDrawerToggle = () => {
-    setOpen(!open);
-  };
+  const handleDrawerToggle = () => { setOpen(!open);};
 
   async function loadCases(token) {
     try {
@@ -127,28 +120,43 @@ export default function TeacherPage() {
   }
 
   async function updateCaso(data){
-  const token = JSON.parse(localStorage.getItem("Token"));
+    const token = JSON.parse(localStorage.getItem("Token"));
 
-  if (!token?.access_token){
-    console.log("No hay token");
-    return;
+    if (!token?.access_token){
+      console.log("No hay token");
+      return;
+    }
+
+    try {
+
+      await updateCase(token.access_token, data);
+      await updateRubrica(token.access_token, data.id, data.rubrica);
+      await loadCases(token.access_token);
+      setMessageAlert("Caso actualizado exitosamente");
+      setSuccessAlert(true);
+      setOpenViewModal(false);
+
+    } catch (error) {
+      console.log("Error al actualizar:", error);
+    }
+
   }
 
-  try {
-
-    await updateCase(token.access_token, data);
-    await updateRubrica(token.access_token, data.id, data.rubrica);
-    await loadCases(token.access_token);
-    setMessageAlert("Caso actualizado exitosamente");
-    setSuccessAlert(true);
-    setOpenViewModal(false);
-
-  } catch (error) {
-    console.log("Error al actualizar:", error);
+  async function deleteC(id){
+    const token = JSON.parse(localStorage.getItem("Token"));
+    if (token && token.access_token){
+      try {
+        const response = await deleteCase(token.access_token, id)
+        await loadCases(token.access_token);
+        setMessageAlert("Caso eliminado exitosamente");
+        setSuccessAlert(true);
+      } catch (error) {
+        console.error("Error al eliminar caso:", error);
+      }
+    }else {
+      console.error("No hay token");
+    }
   }
-
-}
-
 
   useEffect(() => {
     const token = JSON.parse(localStorage.getItem("Token"));
@@ -163,9 +171,7 @@ export default function TeacherPage() {
   const currentCases = cases.slice(indexOfFirstCase, indexOfLastCase);
   const totalPages = Math.ceil(cases.length / casesPerPage);
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  const handlePageChange = (pageNumber) => { setCurrentPage(pageNumber);};
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -197,7 +203,7 @@ export default function TeacherPage() {
           {/* Casos */}
           <ListItem disablePadding>
             <ListItemButton onClick={() => setOpenCasos(!openCasos)}>
-              <ListItemText primary="Casos" />
+              <ListItemText primary="Panel Del Coordinador" />
               {openCasos ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
@@ -207,10 +213,10 @@ export default function TeacherPage() {
                 sx={{ pl: 4 }}
                 onClick={() => setOpenCreateModal(true)}
               >
-                <ListItemText primary="Casos" />
+                <ListItemText primary=" Ver Analsiis" />
               </ListItemButton>
               <ListItemButton sx={{ pl: 4 }}>
-                <ListItemText primary="Crear Caso" />
+                <ListItemText primary="Ver" />
               </ListItemButton>
             </List>
           </Collapse>
@@ -220,20 +226,27 @@ export default function TeacherPage() {
             <ListItemButton
               onClick={() => setOpenEstudiantes(!openEstudiantes)}
             >
-              <ListItemText primary="Estudiantes" />
+              <ListItemText primary="Casos de Estudio" />
               {openEstudiantes ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
           <Collapse in={openEstudiantes} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               <ListItemButton sx={{ pl: 4 }}>
-                <ListItemText primary="Lista de estudiantes" />
+                <ListItemText primary="Ver Casos" />
               </ListItemButton>
               <ListItemButton sx={{ pl: 4 }}>
-                <ListItemText primary="Calificaciones" />
+                <ListItemText primary="Ver Casos" />
               </ListItemButton>
             </List>
           </Collapse>
+
+          {/* Calificaciones */}
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemText primary="Estudiantes" />
+            </ListItemButton>
+          </ListItem>
 
           {/* Salir */}
           <ListItem disablePadding>
@@ -315,6 +328,19 @@ export default function TeacherPage() {
                   onClick={() => loadCase(caseItem.id)}
                 >
                   Ver
+                </button>
+                <button
+                  style={{
+                    padding: "6px 16px",
+                    borderRadius: 4,
+                    border: "1px solid #red",
+                    color: "#ffffff",
+                    background: "red",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => deleteC(caseItem.id)}
+                >
+                  Eliminar
                 </button>
               </Box>
             ))}

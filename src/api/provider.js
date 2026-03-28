@@ -1,37 +1,11 @@
-import {TOKEN_ENDPOINT, BASE_URL} from "./configApi";
+import { TOKEN_ENDPOINT, BASE_URL } from "./configApi";
 import axios from "axios";
-
-
-// Mock user data
-// const mockUsers = [
-//     {
-//         uid: '1',
-//         email: 'test@example.com',
-//         password: '123456',
-//         displayName: 'Wilson Estrada',
-//         rol: 'teacher'
-//     },
-// ];
-
-// export const loginUser = async (email, password) => {
-//     const user = mockUsers.find(u => u.email === email && u.password === password);
-//     if (user) {
-//         return {
-//             ok: true,
-//             ...user,
-//         };
-//     } else {
-//         return {
-//             ok: false,
-//             errorMessage: 'Usuario o contraseña incorrectos',
-//         };
-//     }
-// };
+import api from "./apiClient";
 
 export const loginUser = async (email, password) => {
-    const body = new URLSearchParams();
-    body.append("username", email);
-    body.append("password", password);
+  const body = new URLSearchParams();
+  body.append("username", email);
+  body.append("password", password);
 
   try {
     const response = await axios.post(TOKEN_ENDPOINT, body.toString(), {
@@ -39,69 +13,210 @@ export const loginUser = async (email, password) => {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
-
     const tokenData = response.data;
-    const expirationTime = new Date().getTime() + tokenData.tiempo_expiracion  * 60 * 1000; // Convertir a milisegundos
-    localStorage.setItem("Token", JSON.stringify({
-      ...tokenData,
-      expirationTime,
-    }));
+    console.log(tokenData)
+    // const expirationTime = new Date().getTime() + tokenData.tiempo_expiracion  * 60 * 1000; // Convertir a milisegundos
+    localStorage.setItem("Token", JSON.stringify({...tokenData,})
+        // expirationTime,
+      // }),
+    );
 
-    return{
-        ok: true,
-        ...tokenData,
-    }
+    return {
+      ok: true,
+      ...tokenData,
+    };
   } catch (error) {
-    console.error("Error fetching token:", error.response?.data || error.message);
+    console.error(
+      "Error fetching token:",
+      error.response?.data || error.message,
+    );
     return null;
   }
 };
 
-export const signUp = async ({ email, password }) => {
-    const exists = mockUsers.some(u => u.email === email);
-    if (exists) {
-        return {
-            ok: false,
-            errorMessage: 'El usuario ya existe',
-        };
-    }
-    const newUser = {
-        uid: String(mockUsers.length + 1),
-        email,
-        password,
-        displayName: email.split('@')[0],
-        photoURL: 'https://media.istockphoto.com/id/1495088043/es/vector/icono-de-perfil-de-usuario-avatar-o-icono-de-persona-foto-de-perfil-s%C3%ADmbolo-de-retrato.jpg?s=612x612&w=0&k=20&c=mY3gnj2lU7khgLhV6dQBNqomEGj3ayWH-xtpYuCXrzk=',
-        country: 'ES',
-        darkMode: false,
-        followers: 0,
-        following: 0,
-        isloggedWithSpotify: false,
-    };
-    mockUsers.push(newUser);
-    return {
-        ok: true,
-        uid: newUser.uid,
-    };
-};
+export const signUp = async (data) => {
+  try {
+    const response = await axios.post(BASE_URL + "usuarios/", data)
+    return response.data;
+  } catch (error) {
+    console.log("No se pudo crear el usuario ", error);
+    throw error;
+  }
+}
 
 export const getUserInfo = async (token) => {
-  const response = await axios.get(BASE_URL + "/me", {
+  const response = await api.get(BASE_URL + "me", {
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
 
   return response.data;
 };
-    // const found = mockUsers.find(u => u.uid === user.uid);
-    // return found || null;
 
+export const getCases = async (token) => {
+  try {
+    const response = await api.get(BASE_URL + "casos", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return await response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching cases:",
+      error.response?.data || error.message,
+    );
+    return [];
+  }
+};
+
+export const createCase = async (token, caseData) => {
+  try {
+    const response = await api.post(BASE_URL + "casos/", caseData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error creando el caso:", error.response?.data || error.message, );
+    throw error;
+  }
+};
 
 export const updateUserInfo = async (userUid, updatedFields) => {
-    const user = mockUsers.find(u => u.uid === userUid);
-    if (user) {
-        Object.assign(user, updatedFields);
-        return true;
+  const user = mockUsers.find((u) => u.uid === userUid);
+  if (user) {
+    Object.assign(user, updatedFields);
+    return true;
+  }
+  return false;
+};
+
+export const getCasesById = async (token, id) => {
+  const response = await api.get(BASE_URL + "casos/" + id, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const updateCaseById = async (token, id) => {
+  console.log("id: ", id);
+  const response = await api.put(
+    BASE_URL + "casos/" + id.id,
+    {
+      titulo: id.titulo,
+      descripcion: id.descripcion,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return response.data;
+};
+
+export const deleteCases = async (token, id) => {
+  const response = await api.delete(BASE_URL + "casos/" + id, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const createRubricas = async (token, data, responseSave) => {
+  const response = await api.post(
+    BASE_URL + "rubricas/caso/" + responseSave.id,
+    {
+      caso_id: responseSave.id,
+      docente_id: responseSave.creador_id,
+      nombre: data.tituloRubrica,
+      descripcion: data.rubrica,
+      tipo_rubrica: data.tipoRubrica,
+      puntaje_maximo: data.escalaMax,
+      publica: data.publica,
+      vigente: data.vigente,
+      permitir_autoevaluacion: data.autoEvaluacion,
+      criterios: data.criterios
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return response.data;
+};
+
+export const updateRubricaById = async (token, id) => {
+  console.log("id: ", id);
+  const response = await api.put( BASE_URL + "casos/" + id.id,
+    {
+      titulo: id.titulo,
+      descripcion: id.descripcion,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return response.data;
+};
+
+export const getRubricaCriteriosById = async (token, id) => {
+  const response = await api.get( BASE_URL + "rubricas/caso/" + id, {
+    headers: {
+        Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data
+};
+
+export const updateRubricas = async (token, casoId, rubrica) => {
+
+  const response = await api.put(
+    BASE_URL + "rubricas/caso/" + casoId,
+    rubrica,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-    return false;
+  );
+
+  return response.data;
+};
+
+export const createRespuesta = async (token, data) => {
+    const response = await api.post(BASE_URL + "entregas", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data
+}
+
+export const getEntregasById = async (token) => {
+  const response = await api.get(BASE_URL + "entregas/MisEntregas", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const getEvaluacionById = async (token, id) => {
+  const response = await api.get(BASE_URL + "evaluaciones/MisEvaluaciones/" + id , {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data
 };
