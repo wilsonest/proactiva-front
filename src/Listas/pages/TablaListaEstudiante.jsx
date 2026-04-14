@@ -6,7 +6,6 @@ import { UserContext } from "../../auth/context/UserContext";
 import { CasesContext } from "../../dashboards/context/CasesContext";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
 import Toolbar from "@mui/material/Toolbar";
@@ -18,9 +17,6 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ViewCaseModalStuedent from "../../dashboards/components/ViewCaseModalStudent";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -62,12 +58,16 @@ export default function ListaEstudiante() {
   const [openCasos, setOpenCasos] = useState(false);
   const { logout } = useContext(UserContext);
   const { getCaseById } = useContext(CasesContext);
-  const { getEntregasByEstudent, getEvaluacionesByEstudiante } = useContext(EntregasContext);
+  const { getEntregasByEstudent, getEvaluacionesByEstudiante, getMiEntrega } =
+    useContext(EntregasContext);
   const [open, setOpen] = useState(true);
   const [page, setPage] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
   const [tableInfo, setTableInfo] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { userState: { user },} = useContext(UserContext);
+  const {
+    userState: { user },
+  } = useContext(UserContext);
 
   const idUser = user?.id;
 
@@ -79,46 +79,44 @@ export default function ListaEstudiante() {
     }
   }, [idUser]);
 
-async function loadMyCases(idUser) {
-  const token = JSON.parse(localStorage.getItem("Token"));
+  async function loadMyCases(idUser) {
+    const token = JSON.parse(localStorage.getItem("Token"));
 
-  if (!token?.access_token) {
-    console.error("No hay token");
-    return;
+    if (!token?.access_token) {
+      console.error("No hay token");
+      return;
+    }
+
+    try {
+      const entregaData = await getMiEntrega(token.access_token);
+
+      const tableData = await Promise.all(
+        entregaData.map(async (entrega) => {
+          const caso = await getCaseById(token.access_token, entrega.caso_id);
+          let evaluacion = null;
+
+          try {
+            evaluacion = await getEvaluacionesByEstudiante(
+              token.access_token,
+              entrega.id,
+            );
+          } catch {
+            evaluacion = null;
+          }
+
+          return {
+            titulo: caso?.titulo ?? "Sin título",
+            estado: evaluacion?.estado ?? "Sin evaluar",
+            nota: evaluacion?.nota_total ?? "-",
+          };
+        }),
+      );
+
+      setTableInfo(tableData);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   }
-
-  try {
-    const entregaData = await getEntregasByEstudent(
-      token.access_token,
-      idUser
-    );
-
-    const tableData = await Promise.all(
-      entregaData.map(async (entrega) => {
-        const caso = await getCaseById(token.access_token, entrega.caso_id);
-
-        let evaluacion = null;
-
-        try {
-          evaluacion = await getEvaluacionesByEstudiante(token.access_token, entrega.id);
-        } catch {
-          evaluacion = null;
-        }
-
-        return {
-          titulo: caso?.titulo ?? "Sin título",
-          estado: evaluacion?.estado ?? "Sin evaluar",
-          nota: evaluacion?.nota_total ?? "-",
-        };
-      })
-    );
-
-    setTableInfo(tableData);
-
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -138,6 +136,10 @@ async function loadMyCases(idUser) {
     navigate("/Login", { replace: true });
   };
 
+  const filteredData = tableInfo.filter((row) =>
+    row.titulo.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
   return (
     <>
       <CssBaseline />
@@ -150,8 +152,8 @@ async function loadMyCases(idUser) {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
-            backgroundColor: "darkgreen", // 👈 Fondo
-            color: "white", // 👈 Color texto por defecto
+            backgroundColor: "darkgreen",
+            color: "white",
           },
         }}
         variant="persistent"
@@ -202,6 +204,24 @@ async function loadMyCases(idUser) {
 
       <Main open={open}>
         <Toolbar />
+        <input
+          type="text"
+          placeholder="Buscar por nombre de caso..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setPage(0); // resetear paginación
+          }}
+          style={{
+            padding: "8px",
+            borderRadius: 4,
+            border: "1px solid #ccc",
+            width: "100%",
+            marginBottom: "10px",
+            color: 'black',
+            background: 'white'
+          }}
+        />
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
           {/* <TableContainer sx={{ maxHeight: 440 }}> */}
           <TableContainer sx={{}}>
@@ -220,7 +240,7 @@ async function loadMyCases(idUser) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {tableInfo
+                {filteredData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => {
                     return (
@@ -249,7 +269,7 @@ async function loadMyCases(idUser) {
           <TablePagination
             rowsPerPageOptions={[10, 25, 100]}
             component="div"
-            count={tableInfo.length}
+            count={filteredData.length} // 👈 aquí
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

@@ -11,10 +11,10 @@ const casesInitialState = {
 
 export const CasesProvider = ({ children }) => {
     const [casesState, dispatch] = useReducer(casesReducer, casesInitialState);
-    const {getAllCases, createCases, getCaseById, deleteCase, updateCase, createRubrica, getRyCbyId, updateRubrica, generateResponse} = useCases(dispatch);
+    const {getAllCases, createCases, getCaseById, deleteCase, updateCase, createRubrica, getRyCbyId, updateRubrica, generateResponse, evaluacionIa, getEntregaByCasos} = useCases(dispatch);
 
     return (
-        <CasesContext.Provider value={{ casesState, getAllCases, createCases, getCaseById, deleteCase, updateCase, createRubrica, getRyCbyId, updateRubrica, generateResponse }}>
+        <CasesContext.Provider value={{ casesState, getAllCases, createCases, getCaseById, deleteCase, updateCase, createRubrica, getRyCbyId, updateRubrica, generateResponse, evaluacionIa, getEntregaByCasos }}>
             {children}
         </CasesContext.Provider>
     );

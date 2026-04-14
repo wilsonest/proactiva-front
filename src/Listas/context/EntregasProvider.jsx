@@ -11,10 +11,10 @@ const casesInitialState = {
 
 export const EntregasProvider = ({ children }) => {
     const [entregasState, dispatch] = useReducer(entregasReducer, casesInitialState);
-    const {getEntregasByEstudent, getEvaluacionesByEstudiante} = useEntregas(dispatch);
+    const {getEntregasByEstudent, getEvaluacionesByEstudiante, getAllEstudiantes, getAllCalificaciones, getUsuariosById, getCaseById, getMiEntrega, getAllCases, getEntregasByCasoId} = useEntregas(dispatch);
 
     return (
-        <EntregasContext.Provider value={{entregasState, getEntregasByEstudent, getEvaluacionesByEstudiante }}>
+        <EntregasContext.Provider value={{entregasState, getEntregasByEstudent, getEvaluacionesByEstudiante, getAllEstudiantes, getAllCalificaciones, getUsuariosById, getCaseById, getMiEntrega, getAllCases, getEntregasByCasoId }}>
             {children}
         </EntregasContext.Provider>
     );

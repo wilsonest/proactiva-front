@@ -105,7 +105,6 @@ export const getCasesById = async (token, id) => {
 };
 
 export const updateCaseById = async (token, id) => {
-  console.log("id: ", id);
   const response = await api.put(
     BASE_URL + "casos/" + id.id,
     {
@@ -203,7 +202,25 @@ export const createRespuesta = async (token, data) => {
     return response.data
 }
 
-export const getEntregasById = async (token) => {
+export const getEntregasById = async (token, id) => {
+  const response = await api.get(BASE_URL + "entregas/" + id , {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const getEntregasByCaso = async (token, id) => {
+  const response = await api.get(BASE_URL + "entregas/caso/" + id , {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const getMisEntregas = async (token) => {
   const response = await api.get(BASE_URL + "entregas/MisEntregas", {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -220,3 +237,40 @@ export const getEvaluacionById = async (token, id) => {
   });
   return response.data
 };
+
+export const getEstudiantes = async (token) => {
+  const response = await api.get(BASE_URL + "estudiantes",{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data
+}
+
+export const getUsuarioById = async (token, id) => {
+  const response = await api.get(BASE_URL + "usuarios/" + id, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data
+}
+
+export const getEvaluaciones = async (token) => {
+  const response = await api.get(BASE_URL + "evaluaciones", {
+    headers: {
+        Authorization: `Bearer ${token}`,
+      },
+  });
+  return response.data
+}
+
+export const evaluarIa = async (token, entrega_id) => {
+  const response = await api.post(BASE_URL + "evaluaciones/evaluar-con-ia/" + entrega_id, null, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data
+}

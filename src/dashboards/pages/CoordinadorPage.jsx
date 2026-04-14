@@ -51,6 +51,7 @@ export default function CoordinadorPage() {
   const [casebyid, setcasebyid] = useState([]);
   const [criteriosbyid, setCriteriosByID] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const casesPerPage = 4;
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openViewModal, setOpenViewModal] = useState(false);
@@ -100,12 +101,10 @@ export default function CoordinadorPage() {
   }
 
   async function crearCaso(data) {
-    console.log("data", data);
     const token = JSON.parse(localStorage.getItem("Token"));
     if (token && token.access_token) {
       try {
         const guardar = await createCases(token.access_token, data);
-        console.log("responseSave", guardar)
         await createRubrica(token.access_token,data,guardar);
         await loadCases(token.access_token);
         setMessageAlert("Caso creado exitosamente");
@@ -165,11 +164,17 @@ export default function CoordinadorPage() {
     }
   }, []);
 
-  // Paginación
+
+  // Filtro de búsqueda por nombre de caso
+  const filteredCases = cases.filter((caseItem) =>
+    caseItem.titulo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Paginación sobre los casos filtrados
   const indexOfLastCase = currentPage * casesPerPage;
   const indexOfFirstCase = indexOfLastCase - casesPerPage;
-  const currentCases = cases.slice(indexOfFirstCase, indexOfLastCase);
-  const totalPages = Math.ceil(cases.length / casesPerPage);
+  const currentCases = filteredCases.slice(indexOfFirstCase, indexOfLastCase);
+  const totalPages = Math.ceil(filteredCases.length / casesPerPage);
 
   const handlePageChange = (pageNumber) => { setCurrentPage(pageNumber);};
 
@@ -209,44 +214,12 @@ export default function CoordinadorPage() {
           </ListItem>
           <Collapse in={openCasos} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              <ListItemButton
-                sx={{ pl: 4 }}
-                onClick={() => setOpenCreateModal(true)}
-              >
-                <ListItemText primary=" Ver Analsiis" />
-              </ListItemButton>
-              <ListItemButton sx={{ pl: 4 }}>
-                <ListItemText primary="Ver" />
+              <ListItemButton sx={{ pl: 4 }} onClick={() => navigate("/profesores") }>
+                <ListItemText primary=" Ver Profesores" />
               </ListItemButton>
             </List>
           </Collapse>
 
-          {/* Estudiantes */}
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => setOpenEstudiantes(!openEstudiantes)}
-            >
-              <ListItemText primary="Casos de Estudio" />
-              {openEstudiantes ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-          </ListItem>
-          <Collapse in={openEstudiantes} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              <ListItemButton sx={{ pl: 4 }}>
-                <ListItemText primary="Ver Casos" />
-              </ListItemButton>
-              <ListItemButton sx={{ pl: 4 }}>
-                <ListItemText primary="Ver Casos" />
-              </ListItemButton>
-            </List>
-          </Collapse>
-
-          {/* Calificaciones */}
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemText primary="Estudiantes" />
-            </ListItemButton>
-          </ListItem>
 
           {/* Salir */}
           <ListItem disablePadding>
@@ -299,80 +272,101 @@ export default function CoordinadorPage() {
             <h2 style={{ color: "black", marginBottom: 8 }}>
               Tablero de Casos
             </h2>
+            {/* Input de búsqueda */}
+            <input
+              type="text"
+              placeholder="Buscar por nombre de caso..."
+              value={searchTerm}
+              onChange={e => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reinicia a la primera página al buscar
+              }}
+              style={{
+                padding: '8px',
+                borderRadius: 4,
+                border: '1px solid #ccc',
+                width: '100%',
+                marginTop: 8,
+                marginBottom: 8,
+                color: 'black',
+                background: 'white'
+              }}
+            />
           </Box>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-            {currentCases.map((caseItem) => (
-              <Box
-                key={caseItem.id}
-                sx={{
-                  flex: "1 1 40%",
-                  minWidth: 250,
-                  p: 2,
-                  border: "1px solid #e0e0e0",
-                  borderRadius: 2,
-                  background: "#fff",
-                }}
-              >
-                <h3>{caseItem.titulo}</h3>
-                <p>{caseItem.descripcion.slice(0,20)}</p>
-                <button
-                  style={{
-                    padding: "6px 16px",
-                    margin: "6px",
-                    borderRadius: 4,
-                    border: "1px solid #1976d2",
-                    color: "#1976d2",
-                    background: "transparent",
-                    cursor: "pointer",
+            {currentCases.length === 0 ? (
+              <p style={{ color: 'gray', width: '100%' }}>No se encontraron casos.</p>
+            ) : (
+              currentCases.map((caseItem) => (
+                <Box
+                  key={caseItem.id}
+                  sx={{
+                    flex: "1 1 40%",
+                    minWidth: 250,
+                    p: 2,
+                    border: "1px solid #e0e0e0",
+                    borderRadius: 2,
+                    background: "#fff",
                   }}
-                  onClick={() => loadCase(caseItem.id)}
                 >
-                  Ver
-                </button>
-                <button
-                  style={{
-                    padding: "6px 16px",
-                    borderRadius: 4,
-                    border: "1px solid #red",
-                    color: "#ffffff",
-                    background: "red",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => deleteC(caseItem.id)}
-                >
-                  Eliminar
-                </button>
-              </Box>
-            ))}
+                  <h3>{caseItem.titulo}</h3>
+                  <p>{caseItem.descripcion.slice(0, 20)}</p>
+                  <button
+                    style={{
+                      padding: "6px 16px",
+                      margin: "6px",
+                      borderRadius: 4,
+                      border: "1px solid #1976d2",
+                      color: "#1976d2",
+                      background: "transparent",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => loadCase(caseItem.id)}
+                  >
+                    Ver
+                  </button>
+                  <button
+                    style={{
+                      padding: "6px 16px",
+                      borderRadius: 4,
+                      border: "1px solid red",
+                      color: "#ffffff",
+                      background: "red",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => deleteC(caseItem.id)}
+                  >
+                    Eliminar
+                  </button>
+                </Box>
+              ))
+            )}
           </Box>
           {/* Paginación */}
-          {totalPages > 1 && (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    style={{
-                      margin: "0 4px",
-                      padding: "6px 12px",
-                      borderRadius: 4,
-                      border:
-                        page === currentPage
-                          ? "2px solid #1976d2"
-                          : "1px solid #ccc",
-                      background: page === currentPage ? "#1976d2" : "#fff",
-                      color: page === currentPage ? "#fff" : "#1976d2",
-                      cursor: "pointer",
-                      fontWeight: page === currentPage ? "bold" : "normal",
-                    }}
-                  >
-                    {page}
-                  </button>
-                ),
-              )}
-            </Box>
-          )}
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+            {totalPages > 1 &&
+              Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  style={{
+                    margin: "0 4px",
+                    padding: "6px 12px",
+                    borderRadius: 4,
+                    border:
+                      page === currentPage
+                        ? "2px solid #1976d2"
+                        : "1px solid #ccc",
+                    background: page === currentPage ? "#1976d2" : "#fff",
+                    color: page === currentPage ? "#fff" : "#1976d2",
+                    cursor: "pointer",
+                    fontWeight: page === currentPage ? "bold" : "normal",
+                  }}
+                >
+                  {page}
+                </button>
+              ))}
+          </Box>
         </Box>
       </Main>
 

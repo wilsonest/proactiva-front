@@ -7,5 +7,8 @@ export const casesTypes = {
     createRubrica: "[POST] createRubrica",
     getCriteriosRubricas: "[GET] getCriteriosRubricas",
     updateCriteriosRubricas: "[PUT] updateCriteriosRubricas",
-    generateResponse: "[POST] generateResponse"
+    generateResponse: "[POST] generateResponse",
+    evaluacionIa: "[POST] evaluacionIa",
+    getEntregasByIdCasos: "[GET] getEntregasByIdCasos"
+
 }

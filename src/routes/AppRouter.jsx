@@ -6,7 +6,10 @@ import { useContext } from "react";
 import StudenPage from "../dashboards/pages/StudenPage";
 import TeacherPage from "../dashboards/pages/TeacherPage";
 import CoordinadorPage from "../dashboards/pages/CoordinadorPage";
-import ListaEstudiante from "../Listas/pages/ListaEstudiante";
+import ListaEstudiante from "../Listas/pages/TablaListaEstudiante";
+import ListaAllEstudiante from "../Listas/pages/TablaRegistroEstudiantes";
+import ListaAllCalificaciones from "../Listas/pages/TablaCalificaciones";
+import ProfesoresTable from "../Listas/pages/TablaProfesores";
 
 
 export const AppRouter = () => {
@@ -42,6 +45,8 @@ export const AppRouter = () => {
         <Routes>
           <Route path="/" element={<TeacherPage /> } />
           <Route path="/*" element={<Navigate to="/" />} />
+          <Route path="/ListaAllEstudiante" element={<ListaAllEstudiante />} />
+          <Route path="/ListaAllCalificaciones" element={<ListaAllCalificaciones />} />
         </Routes>
       </>
     );
@@ -52,10 +57,10 @@ export const AppRouter = () => {
       <>
         <Routes>
           <Route path="/" element={<CoordinadorPage />} />
+          <Route path="/profesores" element={<ProfesoresTable />} />
           <Route path="/*" element={<Navigate to="/" />} />
         </Routes>
       </>
     );
-
   }
 };

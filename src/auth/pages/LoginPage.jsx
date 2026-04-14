@@ -164,10 +164,8 @@ export function LoginPage() {
   const providers = [{ id: "credentials", name: "Email and Password" }];
 
   async function crearUsuario(data) {
-    console.log("data", data);
     try {
       const crearUsuario = await signUpWithEmail(data);
-      console.log("responseSave", crearUsuario);
       setSuccessAlert(true); // <-- Mostrar alerta de éxito
       setOpenSignUpModal(false); // <-- Cerrar modal
     } catch (error) {

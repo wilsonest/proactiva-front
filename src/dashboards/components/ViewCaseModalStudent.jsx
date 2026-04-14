@@ -4,6 +4,7 @@ import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { UserContext } from "../../auth/context/UserContext";
+import MenuItem from "@mui/material/MenuItem";
 
 const style = {
   position: "absolute",
@@ -21,13 +22,25 @@ const style = {
   gap: 2,
 };
 
-export default function ViewCaseModalStudent({ open, onClose, onView, onResponse }) {
-  const [caso_id, setId] = useState("")
+export default function ViewCaseModalStudent({
+  open,
+  onClose,
+  onView,
+  onResponse,
+  iaResult,
+  entregaRespuesta
+}) {
+  const [caso_id, setId] = useState("");
   const [titulo, setTitle] = useState("");
   const [descripcion, setDescription] = useState("");
-  const [estudiante_id, setIdEstudiante] = useState()
+  const [estudiante_id, setIdEstudiante] = useState();
   const [respuesta, setRespuesta] = useState("");
-  const { userState: { user },} = useContext(UserContext);
+  const {
+    userState: { user },
+  } = useContext(UserContext);
+  const estados = ["pendiente", "en_revision"];
+  const [estado, setEstado] = useState("");
+  const [typedText, setTypedText] = useState("");
 
   const idUser = user?.id;
 
@@ -37,46 +50,109 @@ useEffect(() => {
     setDescription(onView.descripcion || "");
     setTitle(onView.titulo || "");
     setIdEstudiante(idUser || 0);
-    setRespuesta(""); // limpiar respuesta
+
+    // 👇 aquí está la clave
+    setRespuesta(entregaRespuesta || "");
+
+    setTypedText("");
   }
-}, [onView, idUser]);
+}, [onView, idUser, entregaRespuesta]);
 
+  useEffect(() => {
+    if (!iaResult) return;
 
-const handleCreate = () => {
-  onResponse({ caso_id, estudiante_id, respuesta });
-  setRespuesta("");
-  onClose();
-};
+    const textoCompleto = `Nota final: ${iaResult.nota_total}
 
+${iaResult.detalles
+  .map(
+    (d, i) =>
+      `Criterio ${i + 1}:
+${d.comentario_text}
+(Puntaje: ${d.puntaje_numerico})`,
+  )
+  .join("\n\n")}`;
+
+    let index = 0;
+
+    const interval = setInterval(() => {
+      if (index <= textoCompleto.length) {
+        setTypedText(textoCompleto.slice(0, index));
+        index++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 15);
+
+    return () => clearInterval(interval);
+  }, [iaResult]);
+
+  const handleCreate = () => {
+    onResponse({ caso_id, estudiante_id, respuesta });
+    // setRespuesta("");
+  };
 
   return (
-
     <Modal open={open} onClose={onClose} aria-labelledby="modal-ver-caso">
       <Box sx={style}>
+        <h1 id="modal-crear-caso" style={{ margin: 0 }}>
+          {titulo}
+        </h1>
+        <p>{descripcion}</p>
+        <TextField
+          label="Genera tu respuesta"
+          value={respuesta}
+          onChange={(e) => setRespuesta(e.target.value)}
+          required
+          fullWidth
+          multiline
+          minRows={4}
+          inputProps={{ minLength: 100 }}
+        />
 
-            <h1 id="modal-crear-caso" style={{ margin: 0 }}>
-              {titulo}
-            </h1>
-            <p>{descripcion}</p>
-            <TextField
-              label="Genera tu respuesta"
-              value={respuesta}
-              onChange={(e) => setRespuesta(e.target.value)}
-              required
-              fullWidth
-              multiline
-              minRows={4}
-              inputProps={{ minLength: 100 }}
-            />
-          
-          <Button variant="contained" color="primary" onClick={handleCreate} disabled={respuesta.trim().length < 100}>
-              Resolver Caso 
-          </Button>
+        {iaResult && (
+          <Box
+            sx={{
+              mt: 2,
+              p: 2,
+              borderRadius: 2,
+              background: "#f5f5f5",
+              border: "1px solid #ddd",
+              maxHeight: 200,
+              overflowY: "auto",
+              whiteSpace: "pre-line",
+            }}
+          >
+            <strong>Evaluación IA 🤖</strong>
 
-          <Button variant="outlined" color="secondary" onClick={onClose}>
-            Cerrar
-          </Button>
-        
+            <p style={{ marginTop: 10 }}>{typedText}</p>
+          </Box>
+        )}
+
+        {/* <TextField
+              label="Estado"
+              select
+              value={estado}
+              onChange={(e) => setEstado(e.target.value)}
+            >
+              {estados.map((e) => (
+                <MenuItem key={e} value={e}>
+                  {e}
+                </MenuItem>
+              ))}
+            </TextField> */}
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleCreate}
+          disabled={respuesta.trim().length < 100}
+        >
+          Resolver Caso
+        </Button>
+
+        <Button variant="outlined" color="secondary" onClick={onClose}>
+          Cerrar
+        </Button>
       </Box>
     </Modal>
   );

@@ -52,10 +52,13 @@ export default function TeacherPage() {
   const [casebyid, setcasebyid] = useState([]);
   const [criteriosbyid, setCriteriosByID] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const casesPerPage = 4;
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openViewModal, setOpenViewModal] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
   const [successAlert, setSuccessAlert] = useState(false);
+  const [severity, setSeverity] = useState("success"); // success | error | warning | info
   const [messageAlert, setMessageAlert] = useState("");
 
   const { logout } = useContext(UserContext);
@@ -73,6 +76,11 @@ export default function TeacherPage() {
   const handleDrawerToggle = () => {
     setOpen(!open);
   };
+
+      // Filtro de búsqueda por nombre de caso
+  const filteredCases = cases.filter((caseItem) =>
+      caseItem.titulo.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   async function loadCases(token) {
     try {
@@ -107,12 +115,10 @@ export default function TeacherPage() {
   }
 
   async function crearCaso(data) {
-    console.log("data", data);
     const token = JSON.parse(localStorage.getItem("Token"));
     if (token && token.access_token) {
       try {
         const guardar = await createCases(token.access_token, data);
-        console.log("responseSave", guardar)
         await createRubrica(token.access_token,data,guardar);
         await loadCases(token.access_token);
         setMessageAlert("Caso creado exitosamente");
@@ -126,27 +132,59 @@ export default function TeacherPage() {
     }
   }
 
-  async function updateCaso(data){
+//   async function updateCaso(data){
+//   const token = JSON.parse(localStorage.getItem("Token"));
+
+//   if (!token?.access_token){
+//     console.log("No hay token");
+//     return;
+//   }
+
+//   try {
+
+//     await updateCase(token.access_token, data);
+//     await updateRubrica(token.access_token, data.id, data.rubrica);
+//     await loadCases(token.access_token);
+//     setMessageAlert("Caso actualizado exitosamente");
+//     setSuccessAlert(true);
+//     setOpenViewModal(false);
+
+//   } catch (error) {
+//     console.log("Error al actualizar:", error);
+//   }
+
+// }
+
+async function updateCaso(data) {
   const token = JSON.parse(localStorage.getItem("Token"));
 
-  if (!token?.access_token){
+  if (!token?.access_token) {
     console.log("No hay token");
     return;
   }
 
   try {
-
     await updateCase(token.access_token, data);
     await updateRubrica(token.access_token, data.id, data.rubrica);
     await loadCases(token.access_token);
+
     setMessageAlert("Caso actualizado exitosamente");
-    setSuccessAlert(true);
+    setSeverity("success");
+    setOpenAlert(true);
     setOpenViewModal(false);
 
   } catch (error) {
+    if (error.response?.status === 403) {
+      setMessageAlert("No tienes permiso de editar este caso 🚫");
+      setSeverity("error");
+    } else {
+      setMessageAlert("Error al actualizar el caso");
+      setSeverity("error");
+    }
+
+    setOpenAlert(true);
     console.log("Error al actualizar:", error);
   }
-
 }
 
 
@@ -157,11 +195,11 @@ export default function TeacherPage() {
     }
   }, []);
 
-  // Paginación
-  const indexOfLastCase = currentPage * casesPerPage;
-  const indexOfFirstCase = indexOfLastCase - casesPerPage;
-  const currentCases = cases.slice(indexOfFirstCase, indexOfLastCase);
-  const totalPages = Math.ceil(cases.length / casesPerPage);
+    // Paginación sobre los casos filtrados
+    const indexOfLastCase = currentPage * casesPerPage;
+    const indexOfFirstCase = indexOfLastCase - casesPerPage;
+    const currentCases = filteredCases.slice(indexOfFirstCase, indexOfLastCase);
+    const totalPages = Math.ceil(filteredCases.length / casesPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -207,9 +245,6 @@ export default function TeacherPage() {
                 sx={{ pl: 4 }}
                 onClick={() => setOpenCreateModal(true)}
               >
-                <ListItemText primary="Casos" />
-              </ListItemButton>
-              <ListItemButton sx={{ pl: 4 }}>
                 <ListItemText primary="Crear Caso" />
               </ListItemButton>
             </List>
@@ -226,10 +261,10 @@ export default function TeacherPage() {
           </ListItem>
           <Collapse in={openEstudiantes} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              <ListItemButton sx={{ pl: 4 }}>
+              <ListItemButton sx={{ pl: 4 }} onClick={() => navigate("/ListaAllEstudiante")}>
                 <ListItemText primary="Lista de estudiantes" />
               </ListItemButton>
-              <ListItemButton sx={{ pl: 4 }}>
+              <ListItemButton sx={{ pl: 4 }} onClick={() => navigate("/ListaAllCalificaciones")}>
                 <ListItemText primary="Calificaciones" />
               </ListItemButton>
             </List>
@@ -263,90 +298,109 @@ export default function TeacherPage() {
         onCreate={crearCaso}
       />
 
-      {/* Cambio: Snackbar de éxito */}
+      {/* Cambio: Snackbar */}
       <Snackbar
-        open={successAlert}
-        autoHideDuration={3000}
-        onClose={() => setSuccessAlert(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <MuiAlert
-          onClose={() => setSuccessAlert(false)}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          {messageAlert}
-        </MuiAlert>
-      </Snackbar>
+  open={openAlert}
+  autoHideDuration={3000}
+  onClose={() => setOpenAlert(false)}
+  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+>
+  <MuiAlert
+    onClose={() => setOpenAlert(false)}
+    severity={severity}
+    sx={{ width: "100%" }}
+  >
+    {messageAlert}
+  </MuiAlert>
+</Snackbar>
       {/* Contenido principal: Casos */}
       <Main open={open}>
         <Toolbar />
         <Box sx={{ maxWidth: 900, margin: "0 auto", mt: 4 }}>
           <Box sx={{ mb: 3 }}>
-            <h2 style={{ color: "black", marginBottom: 8 }}>
-              Tablero de Casos
-            </h2>
+            <h2 style={{ color: "black", marginBottom: 8 }}>Tablero de Casos</h2>
+            {/* Input de búsqueda */}
+            <input
+              type="text"
+              placeholder="Buscar por nombre de caso..."
+              value={searchTerm}
+              onChange={e => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reinicia a la primera página al buscar
+              }}
+              style={{
+                padding: '8px',
+                borderRadius: 4,
+                border: '1px solid #ffffff',
+                width: '100%',
+                marginTop: 8,
+                marginBottom: 8,
+                color: 'black',
+                background: 'white'
+              }}
+            />
           </Box>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-            {currentCases.map((caseItem) => (
-              <Box
-                key={caseItem.id}
-                sx={{
-                  flex: "1 1 40%",
-                  minWidth: 250,
-                  p: 2,
-                  border: "1px solid #e0e0e0",
-                  borderRadius: 2,
-                  background: "#fff",
-                }}
-              >
-                <h3>{caseItem.titulo}</h3>
-                <p>{caseItem.descripcion.slice(0,20)}</p>
-                <button
-                  style={{
-                    padding: "6px 16px",
-                    margin: "6px",
-                    borderRadius: 4,
-                    border: "1px solid #1976d2",
-                    color: "#1976d2",
-                    background: "transparent",
-                    cursor: "pointer",
+            {currentCases.length === 0 ? (
+              <p style={{ color: 'gray', width: '100%' }}>No se encontraron casos.</p>
+            ) : (
+              currentCases.map((caseItem) => (
+                <Box
+                  key={caseItem.id}
+                  sx={{
+                    flex: "1 1 40%",
+                    minWidth: 250,
+                    p: 2,
+                    border: "1px solid #e0e0e0",
+                    borderRadius: 2,
+                    background: "#fff",
                   }}
-                  onClick={() => loadCase(caseItem.id)}
                 >
-                  Ver
-                </button>
-              </Box>
-            ))}
+                  <h3>{caseItem.titulo}</h3>
+                  <p>{caseItem.descripcion.slice(0, 20)}</p>
+                  <button
+                    style={{
+                      padding: "6px 16px",
+                      margin: "6px",
+                      borderRadius: 4,
+                      border: "1px solid #1976d2",
+                      color: "#1976d2",
+                      background: "transparent",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => loadCase(caseItem.id)}
+                  >
+                    Ver
+                  </button>
+                </Box>
+              ))
+            )}
           </Box>
           {/* Paginación */}
-          {totalPages > 1 && (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    style={{
-                      margin: "0 4px",
-                      padding: "6px 12px",
-                      borderRadius: 4,
-                      border:
-                        page === currentPage
-                          ? "2px solid #1976d2"
-                          : "1px solid #ccc",
-                      background: page === currentPage ? "#1976d2" : "#fff",
-                      color: page === currentPage ? "#fff" : "#1976d2",
-                      cursor: "pointer",
-                      fontWeight: page === currentPage ? "bold" : "normal",
-                    }}
-                  >
-                    {page}
-                  </button>
-                ),
-              )}
-            </Box>
-          )}
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+            {totalPages > 1 &&
+              Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  style={{
+                    margin: "0 4px",
+                    padding: "6px 12px",
+                    borderRadius: 4,
+                    border:
+                      page === currentPage
+                        ? "2px solid #1976d2"
+                        : "1px solid #ccc",
+                    background: page === currentPage ? "#1976d2" : "#fff",
+                    color: page === currentPage ? "#fff" : "#1976d2",
+                    cursor: "pointer",
+                    fontWeight: page === currentPage ? "bold" : "normal",
+                  }}
+                >
+                  {page}
+                </button>
+              ))}
+          </Box>
         </Box>
       </Main>
 

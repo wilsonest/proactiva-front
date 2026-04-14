@@ -1,5 +1,5 @@
 // Cambio: Renombrar import para evitar conflicto de nombres
-import { getCases, createCase, getCasesById, deleteCases, updateCaseById, createRubricas, getRubricaCriteriosById, updateRubricas, createRespuesta } from "../../api/provider";
+import { getCases, createCase, getCasesById, deleteCases, updateCaseById, createRubricas, getRubricaCriteriosById, updateRubricas, createRespuesta, evaluarIa, getEntregasByCaso } from "../../api/provider";
 import { casesTypes } from "../types/casesTypes";
 
 export const useCases = (dispatch) => {
@@ -32,7 +32,6 @@ export const useCases = (dispatch) => {
     const createCases = async (token, caseData) => {
         try {
             const response = await createCase(token, caseData);
-            console.log("Response data:", response);
             const action = {
                 type: casesTypes.createCase,
                 payload: response,
@@ -49,7 +48,6 @@ export const useCases = (dispatch) => {
     const getCaseById = async (token, id) => {
         try {
             const response = await getCasesById(token, id);
-            console.log("Response data:", response);
             const action = {
                 type: casesTypes.getCasesByID,
                 payload:response,
@@ -65,7 +63,6 @@ export const useCases = (dispatch) => {
     const updateCase = async (token, id) => {
         try {
             const response = await updateCaseById(token, id);
-            console.log("Response Update:", response);
             const action = {
                 type: casesTypes.updateCase,
                 payload:response,
@@ -97,7 +94,6 @@ export const useCases = (dispatch) => {
     const createRubrica = async (token, data, responseSave) => {
         try {
             const response = await createRubricas(token, data, responseSave);
-            console.log("Response data:", response);
             const action = {
                 type: casesTypes.createRubrica,
                 payload:response,
@@ -121,7 +117,6 @@ export const useCases = (dispatch) => {
             dispatch(action);
             return response;
         } catch (error) {
-            console.log("No se pudo actualizar las rubricas y los criterios", error);
             throw error;
         }
     }
@@ -144,7 +139,6 @@ export const useCases = (dispatch) => {
     const generateResponse = async (token, data) => {
         try {
             const response = await createRespuesta(token, data);
-            console.log(response)
             const action = {
                 type: casesTypes.generateResponse,
                 payload: response,
@@ -158,5 +152,36 @@ export const useCases = (dispatch) => {
         
     }
 
-    return {getAllCases, createCases, getCaseById, deleteCase, updateCase, createRubrica, getRyCbyId, updateRubrica, generateResponse}
+    const evaluacionIa = async (token, entrga_id) => {
+        try {
+            const response = await evaluarIa(token, entrga_id);
+            const action = {
+                type: casesTypes.evaluacionIa,
+                payload: response,
+            }
+            dispatch(action);
+            return response
+        } catch (error) {
+            console.log("No se pudo crear la evaluacion", error);
+            throw error;
+        }
+    }
+
+    const getEntregaByCasos = async (token, caso_id) => {
+        try {
+            const response = await getEntregasByCaso(token, caso_id);
+        const action = {
+            type: casesTypes.getEntregasByIdCasos,
+            payload: response,
+        }
+        dispatch(action)
+        return response
+        } catch (error) {
+            console.log("No se pudo obtener la entrega", error);
+            throw error;
+        }
+        
+    }
+
+    return {getAllCases, createCases, getCaseById, deleteCase, updateCase, createRubrica, getRyCbyId, updateRubrica, generateResponse, evaluacionIa, getEntregaByCasos}
 };

@@ -1,7 +1,7 @@
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import React, {useContext, useEffect, useState} from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../auth/context/UserContext";
 import { CasesContext } from "../context/CasesContext";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +23,6 @@ import ViewCaseModalStuedent from "../components/ViewCaseModalStudent";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 
-
 const drawerWidth = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
@@ -42,79 +41,104 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
       }),
       marginLeft: 0,
     }),
-  })
+  }),
 );
 
 export default function StudentPage() {
+  const [openCasos, setOpenCasos] = useState(false);
+  const [cases, setCases] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const casesPerPage = 4;
+  const { logout } = useContext(UserContext);
+  const { getAllCases, getCaseById, generateResponse, evaluacionIa, getEntregaByCasos } =
+    useContext(CasesContext);
+  const [open, setOpen] = useState(true);
+  const [openViewModal, setOpenViewModal] = useState(false);
+  const [casebyid, setcasebyid] = useState([]);
+  const [successAlert, setSuccessAlert] = useState(false);
+  const [messageAlert, setMessageAlert] = useState("");
+  const [iaResult, setIaResult] = useState(null);
+  const [entregaRespuesta,setentregaRespuesta] = useState("");
+  
 
-    const [openCasos, setOpenCasos] = useState(false);
-    const [cases, setCases] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const casesPerPage = 4;
-    const { logout } = useContext(UserContext);
-    const { getAllCases, getCaseById , generateResponse} = useContext(CasesContext);
-    const [open, setOpen] = useState(true);
-    const [openViewModal, setOpenViewModal] = useState(false);
-    const [casebyid, setcasebyid] = useState([]);
-    const [successAlert, setSuccessAlert] = useState(false);
-    const [messageAlert, setMessageAlert] = useState("");
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const handleLogout = () => {
+    logout();
+    navigate("/Login", { replace: true });
+  };
 
-    const handleLogout = () => {
-      logout();
-      navigate("/Login", { replace: true });
-    };
+  // Filtro de búsqueda por nombre de caso
+  const filteredCases = cases.filter((caseItem) =>
+    caseItem.titulo.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
-    const handleDrawerToggle = () => {
-      setOpen(!open);
-    };
+  const handleDrawerToggle = () => {
+    setOpen(!open);
+  };
 
-    async function loadCases(token) {
-      try {
-        const storedCases = await getAllCases(token);
-        if (storedCases) {
-          setCases(storedCases);
-        } else {
-          console.warn("No cases found");
-          setCases([]);
-        }
-      } catch (error) {
-        console.error("Error loading cases:", error);
+  async function loadCases(token) {
+    try {
+      const storedCases = await getAllCases(token);
+      if (storedCases) {
+        setCases(storedCases);
+      } else {
+        console.warn("No cases found");
         setCases([]);
       }
+    } catch (error) {
+      console.error("Error loading cases:", error);
+      setCases([]);
     }
+  }
 
-    async function generarRespuesta(data) {
-      const token =  JSON.parse(localStorage.getItem('Token'));
-      await generateResponse(token, data);
+  async function generarRespuesta(data) {
+    try {
+      const token = JSON.parse(localStorage.getItem("Token"));
+
+      const respuesta = await generateResponse(token, data);
+      console.log("respuesta:", respuesta);
+
+      const respuestaIa = await evaluacionIa(token, respuesta.id);
+      setIaResult(respuestaIa);
+      console.log("respuestaIa:", respuestaIa);
+
       setMessageAlert("Respuesta enviada exitosamente");
       setSuccessAlert(true);
-      setOpenViewModal(false);
+      // setOpenViewModal(false);
+    } catch (error) {
+      console.error("Error en el proceso:", error);
+
+      setMessageAlert("Error al generar la respuesta o evaluación IA");
+      setSuccessAlert(false);
     }
+  }
 
-    useEffect(() => { 
-      const token =  JSON.parse(localStorage.getItem('Token'));
-      if (token && token.access_token) {
-        loadCases(token.access_token);
-      }
-    }, []);
+  useEffect(() => {
+    const token = JSON.parse(localStorage.getItem("Token"));
+    if (token && token.access_token) {
+      loadCases(token.access_token);
+    }
+  }, []);
 
-    // Paginación
-    const indexOfLastCase = currentPage * casesPerPage;
-    const indexOfFirstCase = indexOfLastCase - casesPerPage;
-    const currentCases = cases.slice(indexOfFirstCase, indexOfLastCase);
-    const totalPages = Math.ceil(cases.length / casesPerPage);
+  // Paginación sobre los casos filtrados
+  const indexOfLastCase = currentPage * casesPerPage;
+  const indexOfFirstCase = indexOfLastCase - casesPerPage;
+  const currentCases = filteredCases.slice(indexOfFirstCase, indexOfLastCase);
+  const totalPages = Math.ceil(filteredCases.length / casesPerPage);
 
-    const handlePageChange = (pageNumber) => {
-      setCurrentPage(pageNumber);
-    };
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   async function loadCase(id) {
     const token = JSON.parse(localStorage.getItem("Token"));
     if (token && token.access_token) {
       try {
         const caso = await getCaseById(token.access_token, id);
+        const entrega = await getEntregaByCasos(token.access_token,caso.id);
+        setentregaRespuesta(entrega?.[0]?.respuesta || "Responder...");
         setcasebyid(caso);
         setOpenViewModal(true);
       } catch (error) {
@@ -125,7 +149,7 @@ export default function StudentPage() {
     }
   }
 
-    return (
+  return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
 
@@ -137,8 +161,8 @@ export default function StudentPage() {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
-            backgroundColor: "darkgreen", // 👈 Fondo
-            color: "white",               // 👈 Color texto por defecto
+            backgroundColor: "darkgreen",
+            color: "white",
           },
         }}
         variant="persistent"
@@ -152,9 +176,7 @@ export default function StudentPage() {
         </Toolbar>
         <Divider />
         <List>
-
-
-        {/* Casos */}
+          {/* Casos */}
           <ListItem disablePadding>
             <ListItemButton onClick={() => setOpenCasos(!openCasos)}>
               <ListItemText primary="Casos" />
@@ -163,7 +185,10 @@ export default function StudentPage() {
           </ListItem>
           <Collapse in={openCasos} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              <ListItemButton sx={{ pl: 4 }} onClick={() => navigate("/ListaEstudiante")}>
+              <ListItemButton
+                sx={{ pl: 4 }}
+                onClick={() => navigate("/ListaEstudiante")}
+              >
                 <ListItemText primary="Mis Casos" />
               </ListItemButton>
             </List>
@@ -179,7 +204,10 @@ export default function StudentPage() {
 
           {/* Salir */}
           <ListItem disablePadding>
-            <ListItemButton onClick={handleLogout} sx={{ color: '#e0e0e0', fontWeight: 'bold' }}>
+            <ListItemButton
+              onClick={handleLogout}
+              sx={{ color: "#e0e0e0", fontWeight: "bold" }}
+            >
               <ListItemText primary="Salir" />
             </ListItemButton>
           </ListItem>
@@ -191,21 +219,23 @@ export default function StudentPage() {
         onClose={() => setOpenViewModal(false)}
         onView={casebyid}
         onResponse={generarRespuesta}
+        iaResult={iaResult} // 👈 NUEVO
+        entregaRespuesta ={entregaRespuesta}
       />
 
       <Snackbar
-          open={successAlert}
-          autoHideDuration={3000}
-          onClose={() => setSuccessAlert(false)}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        >
+        open={successAlert}
+        autoHideDuration={3000}
+        onClose={() => setSuccessAlert(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
         <MuiAlert
           onClose={() => setSuccessAlert(false)}
           severity="success"
           sx={{ width: "100%" }}
-          >
-            {messageAlert}
-          </MuiAlert>
+        >
+          {messageAlert}
+        </MuiAlert>
       </Snackbar>
 
       {/* Contenido principal: Casos */}
@@ -213,63 +243,95 @@ export default function StudentPage() {
         <Toolbar />
         <Box sx={{ maxWidth: 900, margin: "0 auto", mt: 4 }}>
           <Box sx={{ mb: 3 }}>
-            <h2 style={{ color: 'black', marginBottom: 8 }}>Tablero de Casos</h2>
+            <h2 style={{ color: "black", marginBottom: 8 }}>
+              Tablero de Casos
+            </h2>
+            {/* Input de búsqueda */}
+            <input
+              type="text"
+              placeholder="Buscar por nombre de caso..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reinicia a la primera página al buscar
+              }}
+              style={{
+                padding: "8px",
+                borderRadius: 4,
+                border: "1px solid #ffffff",
+                width: "100%",
+                marginTop: 8,
+                marginBottom: 8,
+                color: "black",
+                background: "white",
+              }}
+            />
           </Box>
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-            {currentCases.map((caseItem) => (
-              <Box
-                key={caseItem.id}
-                sx={{
-                  flex: "1 1 40%",
-                  minWidth: 250,
-                  p: 2,
-                  border: "1px solid #e0e0e0",
-                  borderRadius: 2,
-                  background: "#fff",
-                }}
-              >
-                <h3>{caseItem.titulo}</h3>
-                <p>{caseItem.descripcion.slice(0,20)}</p>
-                <button
-                  style={{
-                    padding: "6px 16px",
-                    margin: "6px",
-                    borderRadius: 4,
-                    border: "1px solid #1976d2",
-                    color: "#1976d2",
-                    background: "transparent",
-                    cursor: "pointer",
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+            {currentCases.length === 0 ? (
+              <p style={{ color: "gray", width: "100%" }}>
+                No se encontraron casos.
+              </p>
+            ) : (
+              currentCases.map((caseItem) => (
+                <Box
+                  key={caseItem.id}
+                  sx={{
+                    flex: "1 1 40%",
+                    minWidth: 250,
+                    p: 2,
+                    border: "1px solid #e0e0e0",
+                    borderRadius: 2,
+                    background: "#fff",
                   }}
-                  onClick={() => loadCase(caseItem.id)}
                 >
-                  Ver
-                </button>
-              </Box>
-            ))}
+                  <h3>{caseItem.titulo}</h3>
+                  <p>{caseItem.descripcion.slice(0, 20)}</p>
+                  <button
+                    style={{
+                      padding: "6px 16px",
+                      margin: "6px",
+                      borderRadius: 4,
+                      border: "1px solid #1976d2",
+                      color: "#1976d2",
+                      background: "transparent",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => loadCase(caseItem.id)}
+                  >
+                    Ver
+                  </button>
+                </Box>
+              ))
+            )}
           </Box>
-        {/* Paginación */}
-        {totalPages > 1 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                style={{
-                  margin: '0 4px',
-                  padding: '6px 12px',
-                  borderRadius: 4,
-                  border: page === currentPage ? '2px solid #1976d2' : '1px solid #ccc',
-                  background: page === currentPage ? '#1976d2' : '#fff',
-                  color: page === currentPage ? '#fff' : '#1976d2',
-                  cursor: 'pointer',
-                  fontWeight: page === currentPage ? 'bold' : 'normal',
-                }}
-              >
-                {page}
-              </button>
-            ))}
+          {/* Paginación */}
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+            {totalPages > 1 &&
+              Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    style={{
+                      margin: "0 4px",
+                      padding: "6px 12px",
+                      borderRadius: 4,
+                      border:
+                        page === currentPage
+                          ? "2px solid #1976d2"
+                          : "1px solid #ccc",
+                      background: page === currentPage ? "#1976d2" : "#fff",
+                      color: page === currentPage ? "#fff" : "#1976d2",
+                      cursor: "pointer",
+                      fontWeight: page === currentPage ? "bold" : "normal",
+                    }}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
           </Box>
-        )}
         </Box>
       </Main>
 

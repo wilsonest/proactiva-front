@@ -41,7 +41,17 @@ export const casesReducer = (state, action) => {
             return {
                 ...state,
                 cases: action.payload,
-            };      
+            };
+        case casesTypes.evaluacionIa:
+            return {
+                ...state,
+                cases: action.payload,
+            };   
+        case casesTypes.getEntregasByIdCasos:
+            return {
+                ...state,
+                cases: action.payload,
+            };     
         default:
             break
     }

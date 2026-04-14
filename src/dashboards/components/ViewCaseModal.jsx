@@ -27,8 +27,8 @@ const style = {
   gap: 2,
 };
 
-export default function ViewCaseModal({ open, onClose, onView, ryc,onUpdate }) {
-  const [id, setId] = useState("")
+export default function ViewCaseModal({open, onClose, onView, ryc, onUpdate,}) {
+  const [id, setId] = useState("");
   const [titulo, setTitle] = useState("");
   const [descripcion, setDescription] = useState("");
   const [tituloRubrica, setTituloRubrica] = useState("");
@@ -40,99 +40,135 @@ export default function ViewCaseModal({ open, onClose, onView, ryc,onUpdate }) {
   const [autoEvaluacion, setAutoEvaluacion] = useState(false);
   const [openCriterios, setOpenCriterios] = useState(false);
   const [criterios, setCriterios] = useState([]);
-  const [nuevoCriterio, setNuevoCriterio] = useState({ nombre: "", descripcion: "", puntaje_maximo: 0, orden: ""});
-  const [editIndex, setEditIndex] = useState(null);
-
-  const puntajeUsado = criterios.reduce((acc, c) => acc + c.puntaje_maximo, 0);
-  const puntajeDisponible = escalaMax - puntajeUsado;
-
-  const ordenesUsados = criterios.map(c => c.orden);
-
-  const handleAgregarCriterio = () => {
-
-  if (nuevoCriterio.puntaje_maximo > puntajeDisponible && editIndex === null) return;
-
-  if ( ordenesUsados.includes(nuevoCriterio.orden) && criterios[editIndex]?.orden !== nuevoCriterio.orden)
-    return;
-
-  if (editIndex !== null) {
-    const nuevos = [...criterios];
-    nuevos[editIndex] = nuevoCriterio;
-    setCriterios(nuevos);
-    setEditIndex(null);
-  } else {
-    setCriterios([...criterios, nuevoCriterio]);
-  }
-
-  setNuevoCriterio({
+  const [nuevoCriterio, setNuevoCriterio] = useState({
     nombre: "",
     descripcion: "",
     puntaje_maximo: 0,
-    orden: 0,
+    orden: "",
   });
-};
+  const [editIndex, setEditIndex] = useState(null);
 
-useEffect(() => {
-  if (onView && ryc) {
-    setId(onView.id || "")
-    setDescription(onView.descripcion || "");
-    setTitle(onView.titulo || "");
-    setTituloRubrica(ryc.nombre || "");
-    setRubrica(ryc.descripcion || "");
-    setTipoRubrica(ryc.tipo_rubrica || "");
-    setEscalaMax(ryc.escala_maxima || 0);
-    setPublica(ryc.publica || false);
-    setVigente(ryc.vigente || false);
-    setAutoEvaluacion(ryc.permitir_autoevaluacion || false);
-    setCriterios(ryc.criterios || []);
-  }
-}, [onView, ryc]);
+  // const puntajeUsado = criterios.reduce((acc, c) => acc + c.puntaje_maximo, 0);
 
-const handleCreate = () => {
+  // const puntajeDisponible = escalaMax - puntajeUsado;
 
-  const data = {
-    id,
-    titulo,
-    descripcion,
-    rubrica: {
-      id: ryc.id,
-      nombre: tituloRubrica,
-      descripcion: rubrica,
-      tipo_rubrica: tipoRubrica,
-      escala_maxima: escalaMax,
-      publica,
-      vigente,
-      permitir_autoevaluacion: autoEvaluacion,
-      criterios
+  const puntajeUsado = criterios.reduce((acc, c, i) => {
+    if (i === editIndex) return acc; // 👈 ignorar el que estás editando
+    return acc + c.puntaje_maximo;
+  }, 0);
+
+  const puntajeDisponible = escalaMax - puntajeUsado;
+
+  const maxPermitido =
+    editIndex !== null
+      ? puntajeDisponible + (criterios[editIndex]?.puntaje_maximo || 0)
+      : puntajeDisponible;
+
+  const ordenesUsados = criterios.map((c) => c.orden);
+
+  const handleAgregarCriterio = () => {
+    if (nuevoCriterio.puntaje_maximo > puntajeDisponible && editIndex === null)
+      return;
+
+    if (
+      ordenesUsados.includes(nuevoCriterio.orden) &&
+      criterios[editIndex]?.orden !== nuevoCriterio.orden
+    )
+      return;
+
+    if (editIndex !== null) {
+      const nuevos = [...criterios];
+      nuevos[editIndex] = nuevoCriterio;
+      setCriterios(nuevos);
+      setEditIndex(null);
+    } else {
+      setCriterios([...criterios, nuevoCriterio]);
     }
+
+    setNuevoCriterio({
+      nombre: "",
+      descripcion: "",
+      puntaje_maximo: 0,
+      orden: "",
+    });
   };
 
-  onUpdate(data);
+  useEffect(() => {
+    if (onView && ryc) {
+      setId(onView.id || "");
+      setDescription(onView.descripcion || "");
+      setTitle(onView.titulo || "");
+      setTituloRubrica(ryc.nombre || "");
+      setRubrica(ryc.descripcion || "");
+      setTipoRubrica(ryc.tipo_rubrica || "");
+      setEscalaMax(ryc.escala_maxima || 0);
+      setPublica(ryc.publica || false);
+      setVigente(ryc.vigente || false);
+      setAutoEvaluacion(ryc.permitir_autoevaluacion || false);
+      setCriterios(ryc.criterios || []);
+    }
+  }, [onView, ryc]);
 
-  onClose();
-};
+  const handleCreate = () => {
+    const data = {
+      id,
+      titulo,
+      descripcion,
+      rubrica: {
+        id: ryc.id,
+        nombre: tituloRubrica,
+        descripcion: rubrica,
+        tipo_rubrica: tipoRubrica,
+        escala_maxima: escalaMax,
+        publica,
+        vigente,
+        permitir_autoevaluacion: autoEvaluacion,
+        criterios,
+      },
+    };
 
-    const formCompleto = titulo.trim() !== "" && descripcion.trim() !== "" && tituloRubrica.trim() !== "" && rubrica.trim() !== "" 
-  && tipoRubrica.trim() !== "" && escalaMax > 0;
+    onUpdate(data);
 
-    const eliminarCriterio = (index) => { const nuevos = criterios.filter((_, i) => i !== index);
+    onClose();
+  };
+
+  const formCompleto =
+    titulo.trim() !== "" &&
+    descripcion.trim() !== "" &&
+    tituloRubrica.trim() !== "" &&
+    rubrica.trim() !== "" &&
+    tipoRubrica.trim() !== "" &&
+    escalaMax > 0;
+
+  const eliminarCriterio = (index) => {
+    console.log("Eliminando criterio en índice:", index);
+    const nuevos = criterios.filter((_, i) => i !== index);
+    console.log("Lista nueva:", nuevos);
     setCriterios(nuevos);
-  
+
+    setNuevoCriterio({
+      nombre: "",
+      descripcion: "",
+      puntaje_maximo: 0,
+      orden: "",
+    });
+    setEditIndex(null);
   };
 
-  const editarCriterio = (index) => { setNuevoCriterio(criterios[index]);
+  const editarCriterio = (index) => {
+    setNuevoCriterio(criterios[index]);
     setEditIndex(index);
   };
 
   return (
     <>
-    <Modal open={open} onClose={onClose} aria-labelledby="modal-ver-caso">
-      <Box sx={style}>
+      <Modal open={open} onClose={onClose} aria-labelledby="modal-ver-caso">
+        <Box sx={style}>
           <>
             <TextField
               label="Título"
               value={titulo}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
               fullWidth
             />
             <TextField
@@ -146,21 +182,21 @@ const handleCreate = () => {
               // helperText={`${onView.descripcion.length}/2000 caracteres`}
             />
             <TextField
-                label="Título Rubrica"
-                value={tituloRubrica}
-                onChange={(e) => setTituloRubrica(e.target.value)}
-                fullWidth
+              label="Título Rubrica"
+              value={tituloRubrica}
+              onChange={(e) => setTituloRubrica(e.target.value)}
+              fullWidth
             />
 
             <TextField
-                label="Descripción Rubrica"
-                value={rubrica}
-                onChange={(e) => setRubrica(e.target.value)}
-                fullWidth
-                multiline
-                minRows={4}
+              label="Descripción Rubrica"
+              value={rubrica}
+              onChange={(e) => setRubrica(e.target.value)}
+              fullWidth
+              multiline
+              minRows={4}
             />
-            
+
             <TextField
               label="Tipo Rubrica"
               value={tipoRubrica}
@@ -169,52 +205,73 @@ const handleCreate = () => {
             />
 
             <TextField
-            label="Escala maxima"
-            type="number"
-            value={escalaMax}
-            onChange={(e) => setEscalaMax(Number(e.target.value))}
-            inputProps={{ min: 0, max: 100 }}
-            sx={{ width: 200 }}
-          />
-
-          <Box>
-            <FormControlLabel
-              control={<Checkbox checked={publica} onChange={(e) => setPublica(e.target.checked)} />}
-              label="Pública"
+              label="Escala maxima"
+              type="number"
+              value={escalaMax}
+              onChange={(e) => setEscalaMax(Number(e.target.value))}
+              inputProps={{ min: 0, max: 100 }}
+              sx={{ width: 200 }}
             />
 
-            <FormControlLabel
-              control={<Checkbox checked={vigente} onChange={(e) => setVigente(e.target.checked)} />}
-              label="Vigente"
-            />
+            <Box>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={publica}
+                    onChange={(e) => setPublica(e.target.checked)}
+                  />
+                }
+                label="Pública"
+              />
 
-            <FormControlLabel
-              control={<Checkbox checked={autoEvaluacion} onChange={(e) => setAutoEvaluacion(e.target.checked)} />}
-              label="Auto evaluación"
-            />
-          </Box>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={vigente}
+                    onChange={(e) => setVigente(e.target.checked)}
+                  />
+                }
+                label="Vigente"
+              />
 
-          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
-            <Button variant="contained" disabled={!formCompleto} onClick={() => setOpenCriterios(true)}>
-              Criterios
-            </Button>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={autoEvaluacion}
+                    onChange={(e) => setAutoEvaluacion(e.target.checked)}
+                  />
+                }
+                label="Auto evaluación"
+              />
+            </Box>
 
-          <Button variant="contained" color="primary" onClick={handleCreate}>
-            Editar Caso
-          </Button>
-          {}
-          <Button variant="outlined" color="secondary" onClick={onClose}>
-            Cerrar
-          </Button>
-        </Box>
+            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+              <Button
+                variant="contained"
+                disabled={!formCompleto}
+                onClick={() => setOpenCriterios(true)}
+              >
+                Criterios
+              </Button>
 
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleCreate}
+              >
+                Editar Caso
+              </Button>
+              {}
+              <Button variant="outlined" color="secondary" onClick={onClose}>
+                Cerrar
+              </Button>
+            </Box>
           </>
-      </Box>
-    </Modal>
+        </Box>
+      </Modal>
 
-    <Modal open={openCriterios} onClose={() => setOpenCriterios(false)}>
+      <Modal open={openCriterios} onClose={() => setOpenCriterios(false)}>
         <Box sx={style}>
-
           <h2>Agregar Criterios</h2>
 
           <TextField
@@ -230,17 +287,25 @@ const handleCreate = () => {
             label="Descripción"
             value={nuevoCriterio.descripcion}
             onChange={(e) =>
-              setNuevoCriterio({ ...nuevoCriterio, descripcion: e.target.value })}
+              setNuevoCriterio({
+                ...nuevoCriterio,
+                descripcion: e.target.value,
+              })
+            }
             fullWidth
             multiline
           />
 
           <TextField
-            label={`Puntaje (max ${puntajeDisponible})`}
+            label={`Puntaje (max ${maxPermitido})`}
             type="number"
             value={nuevoCriterio.puntaje_maximo}
             onChange={(e) =>
-              setNuevoCriterio({ ...nuevoCriterio, puntaje_maximo: Number(e.target.value)})}
+              setNuevoCriterio({
+                ...nuevoCriterio,
+                puntaje_maximo: Number(e.target.value),
+              })
+            }
             inputProps={{ min: 0, max: puntajeDisponible }}
           />
 
@@ -249,76 +314,70 @@ const handleCreate = () => {
             select
             value={nuevoCriterio.orden}
             onChange={(e) =>
-              setNuevoCriterio({ ...nuevoCriterio, orden: Number(e.target.value)})}
+              setNuevoCriterio({
+                ...nuevoCriterio,
+                orden: Number(e.target.value),
+              })
+            }
           >
-            {[1,2,3,4,5,6,7,8,9,10]
-                .filter(n => !ordenesUsados.includes(n) || n === nuevoCriterio.orden)
-                .map(n => (
-                  <MenuItem key={n} value={n}>
-                    {n}
-                  </MenuItem>
-            ))}
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+              .filter(
+                (n) => !ordenesUsados.includes(n) || n === nuevoCriterio.orden,
+              )
+              .map((n) => (
+                <MenuItem key={n} value={n}>
+                  {n}
+                </MenuItem>
+              ))}
           </TextField>
 
           <Button variant="contained" onClick={handleAgregarCriterio}>
             Agregar
           </Button>
 
+          <Box sx={{ mt: 2 }}>
+            {criterios.map((c, i) => (
+              <Box
+                key={i}
+                sx={{
+                  border: "1px solid #ccc",
+                  p: 1,
+                  mb: 1,
+                  borderRadius: 1,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Box>
+                  <b>{c.nombre}</b> | <b>{c.descripcion}</b> | Puntaje:{" "}
+                  {c.puntaje_maximo} | Orden: {c.orden}
+                </Box>
 
-          <Box sx={{ mt:2 }}>
+                <Box>
+                  <IconButton color="primary" onClick={() => editarCriterio(i)}>
+                    <EditIcon />
+                  </IconButton>
 
-  {criterios.map((c,i)=>(
-    <Box
-      key={i}
-      sx={{
-        border:"1px solid #ccc",
-        p:1,
-        mb:1,
-        borderRadius:1,
-        display:"flex",
-        justifyContent:"space-between",
-        alignItems:"center"
-      }}
-    >
+                  <IconButton
+                    color="error"
+                    onClick={() => {
+                      console.log("Click detectado en botón eliminar", i);
+                      eliminarCriterio(i);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              </Box>
+            ))}
+          </Box>
 
-      <Box>
-        <b>{c.nombre}</b> | <b>{c.descripcion}</b> | Puntaje: {c.puntaje_maximo} | Orden: {c.orden}
-      </Box>
-
-      <Box>
-
-        <IconButton
-          color="primary"
-          onClick={() => editarCriterio(i)}
-        >
-          <EditIcon />
-        </IconButton>
-
-        <IconButton
-          color="error"
-          onClick={() => eliminarCriterio(i)}
-        >
-          <DeleteIcon />
-        </IconButton>
-
-      </Box>
-
-    </Box>
-  ))}
-
-</Box>
-
-
-          <Button
-            variant="outlined"
-            onClick={() => setOpenCriterios(false)}
-          >
+          <Button variant="outlined" onClick={() => setOpenCriterios(false)}>
             Guardar
           </Button>
-
         </Box>
       </Modal>
-
     </>
   );
 }
