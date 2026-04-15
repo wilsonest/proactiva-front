@@ -28,37 +28,46 @@ export default function ViewCaseModalStudent({
   onView,
   onResponse,
   iaResult,
-  entregaRespuesta
+  entregaRespuesta,
+  MyObservacion,
 }) {
+  const {
+    userState: { user },
+  } = useContext(UserContext);
   const [caso_id, setId] = useState("");
   const [titulo, setTitle] = useState("");
   const [descripcion, setDescription] = useState("");
   const [estudiante_id, setIdEstudiante] = useState();
   const [respuesta, setRespuesta] = useState("");
-  const {
-    userState: { user },
-  } = useContext(UserContext);
   const estados = ["pendiente", "en_revision"];
   const [estado, setEstado] = useState("");
   const [typedText, setTypedText] = useState("");
+  const yaRespondio = (entregaRespuesta || "").length > 15;
 
   const idUser = user?.id;
 
-useEffect(() => {
-  if (onView) {
-    setId(onView.id || "");
-    setDescription(onView.descripcion || "");
-    setTitle(onView.titulo || "");
-    setIdEstudiante(idUser || 0);
+  useEffect(() => {
+    if (onView) {
+      setId(onView.id || "");
+      setDescription(onView.descripcion || "");
+      setTitle(onView.titulo || "");
+      setIdEstudiante(idUser || 0);
 
-    // 👇 aquí está la clave
-    setRespuesta(entregaRespuesta || "");
+      // 👇 aquí está la clave
+      setRespuesta(entregaRespuesta || "");
 
-    setTypedText("");
-  }
-}, [onView, idUser, entregaRespuesta]);
+      setTypedText("");
+    }
+  }, [onView, idUser, entregaRespuesta]);
 
   useEffect(() => {
+    // 🔥 prioridad: si ya respondió → mostrar observación
+    if (yaRespondio && MyObservacion) {
+      setTypedText(MyObservacion);
+      return;
+    }
+
+    // 🤖 si no, usa la IA
     if (!iaResult) return;
 
     const textoCompleto = `Nota final: ${iaResult.nota_total}
@@ -84,7 +93,7 @@ ${d.comentario_text}
     }, 15);
 
     return () => clearInterval(interval);
-  }, [iaResult]);
+  }, [iaResult, MyObservacion, entregaRespuesta]);
 
   const handleCreate = () => {
     onResponse({ caso_id, estudiante_id, respuesta });
@@ -109,7 +118,7 @@ ${d.comentario_text}
           inputProps={{ minLength: 100 }}
         />
 
-        {iaResult && (
+        {(iaResult || yaRespondio) && (
           <Box
             sx={{
               mt: 2,
@@ -122,32 +131,21 @@ ${d.comentario_text}
               whiteSpace: "pre-line",
             }}
           >
-            <strong>Evaluación IA 🤖</strong>
+            <strong>
+              {yaRespondio ? "Observación" : "Evaluación IA 🤖"}
+            </strong>
 
             <p style={{ marginTop: 10 }}>{typedText}</p>
           </Box>
         )}
 
-        {/* <TextField
-              label="Estado"
-              select
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-            >
-              {estados.map((e) => (
-                <MenuItem key={e} value={e}>
-                  {e}
-                </MenuItem>
-              ))}
-            </TextField> */}
-
         <Button
           variant="contained"
           color="primary"
           onClick={handleCreate}
-          disabled={respuesta.trim().length < 100}
+          disabled={respuesta.trim().length < 100 || yaRespondio}
         >
-          Resolver Caso
+          {yaRespondio ? "Ya respondiste este caso" : "Resolver Caso"}
         </Button>
 
         <Button variant="outlined" color="secondary" onClick={onClose}>

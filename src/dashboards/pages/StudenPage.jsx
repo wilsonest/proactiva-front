@@ -51,7 +51,7 @@ export default function StudentPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const casesPerPage = 4;
   const { logout } = useContext(UserContext);
-  const { getAllCases, getCaseById, generateResponse, evaluacionIa, getEntregaByCasos } =
+  const { getAllCases, getCaseById, generateResponse, evaluacionIa, getEntregaByCasos, getEvaluacionesByEstudiante } =
     useContext(CasesContext);
   const [open, setOpen] = useState(true);
   const [openViewModal, setOpenViewModal] = useState(false);
@@ -60,6 +60,7 @@ export default function StudentPage() {
   const [messageAlert, setMessageAlert] = useState("");
   const [iaResult, setIaResult] = useState(null);
   const [entregaRespuesta,setentregaRespuesta] = useState("");
+  const [MyObservacion,setMyObservacion] = useState("");
   
 
   const navigate = useNavigate();
@@ -98,11 +99,9 @@ export default function StudentPage() {
       const token = JSON.parse(localStorage.getItem("Token"));
 
       const respuesta = await generateResponse(token, data);
-      console.log("respuesta:", respuesta);
 
       const respuestaIa = await evaluacionIa(token, respuesta.id);
       setIaResult(respuestaIa);
-      console.log("respuestaIa:", respuestaIa);
 
       setMessageAlert("Respuesta enviada exitosamente");
       setSuccessAlert(true);
@@ -133,21 +132,46 @@ export default function StudentPage() {
   };
 
   async function loadCase(id) {
-    const token = JSON.parse(localStorage.getItem("Token"));
-    if (token && token.access_token) {
-      try {
-        const caso = await getCaseById(token.access_token, id);
-        const entrega = await getEntregaByCasos(token.access_token,caso.id);
-        setentregaRespuesta(entrega?.[0]?.respuesta || "Responder...");
-        setcasebyid(caso);
-        setOpenViewModal(true);
-      } catch (error) {
-        console.error("Error al abrir el caso:", error);
+  const token = JSON.parse(localStorage.getItem("Token"));
+
+  if (token && token.access_token) {
+    try {
+      const caso = await getCaseById(token.access_token, id);
+
+      const entrega = await getEntregaByCasos(
+        token.access_token,
+        caso.id
+      );
+
+      const entregaId = entrega?.[0]?.id;
+
+      setentregaRespuesta(entrega?.[0]?.respuesta || "Responder...");
+
+      let observacion = "";
+
+      if (entregaId) {
+        const Myevaluacion = await getEvaluacionesByEstudiante(
+          token.access_token,
+          entregaId
+        );
+
+        observacion =
+          Myevaluacion?.observaciones_text ||
+          Myevaluacion?.[0]?.observaciones_text ||
+          "";
       }
-    } else {
-      console.error("No hay token");
+
+      setMyObservacion(observacion);
+      setcasebyid(caso);
+      setOpenViewModal(true);
+
+    } catch (error) {
+      console.error("Error al abrir el caso:", error);
     }
+  } else {
+    console.error("No hay token");
   }
+}
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -215,12 +239,13 @@ export default function StudentPage() {
       </Drawer>
 
       <ViewCaseModalStuedent
-        open={openViewModal}
+        open = {openViewModal}
         onClose={() => setOpenViewModal(false)}
-        onView={casebyid}
-        onResponse={generarRespuesta}
-        iaResult={iaResult} // 👈 NUEVO
-        entregaRespuesta ={entregaRespuesta}
+        onView = {casebyid}
+        onResponse = {generarRespuesta}
+        iaResult = {iaResult}
+        entregaRespuesta = {entregaRespuesta}
+        MyObservacion = {MyObservacion}
       />
 
       <Snackbar
