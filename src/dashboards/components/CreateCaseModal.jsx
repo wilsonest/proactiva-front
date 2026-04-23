@@ -26,6 +26,24 @@ const style = {
   gap: 2,
 };
 
+const styleCriterios = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 700,
+  maxHeight: "95vh", // 👈 límite vertical
+  bgcolor: "background.paper",
+  // border: "2px solid #1976d2",
+  boxShadow: 24,
+  p: 3,
+  borderRadius: 2,
+  display: "flex",
+  flexDirection: "column",
+  gap: 2,
+  overflowY: "auto", // 👈 scroll automático
+};
+
 export default function CreateCaseModal({ open, onClose, onCreate }) {
   const [titulo, setTitle] = useState("");
   const [descripcion, setDescription] = useState("");
@@ -200,7 +218,7 @@ const handleAgregarCriterio = () => {
 
 
       <Modal open={openCriterios} onClose={() => setOpenCriterios(false)}>
-        <Box sx={style}>
+        <Box sx={styleCriterios}>
 
           <h2>Agregar Criterios</h2>
 

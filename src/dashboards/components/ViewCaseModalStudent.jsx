@@ -12,6 +12,8 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 800,
+  maxHeight: "90vh", // 🔥 límite de altura
+  overflowY: "auto", // 🔥 scroll vertical
   bgcolor: "background.paper",
   border: "2px solid #1976d2",
   boxShadow: 24,
@@ -119,25 +121,23 @@ ${d.comentario_text}
         />
 
         {(iaResult || yaRespondio) && (
-          <Box
-            sx={{
-              mt: 2,
-              p: 2,
-              borderRadius: 2,
-              background: "#f5f5f5",
-              border: "1px solid #ddd",
-              maxHeight: 200,
-              overflowY: "auto",
-              whiteSpace: "pre-line",
-            }}
-          >
-            <strong>
-              {yaRespondio ? "Observación" : "Evaluación IA 🤖"}
-            </strong>
-
-            <p style={{ marginTop: 10 }}>{typedText}</p>
-          </Box>
-        )}
+  <TextField
+    label={yaRespondio ? "Observación" : "Evaluación IA 🤖"}
+    value={typedText}
+    fullWidth
+    multiline
+    minRows={6} // 👈 tamaño base
+    maxRows={12} // 👈 crece pero con límite
+    InputProps={{
+      readOnly: true, // 👈 solo lectura (clave)
+    }}
+    sx={{
+      mt: 2,
+      background: "#f5f5f5",
+      borderRadius: 2,
+    }}
+  />
+)}
 
         <Button
           variant="contained"
