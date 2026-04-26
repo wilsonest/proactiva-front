@@ -36,7 +36,8 @@ export const loginUser = async (email, password) => {
 
 export const signUp = async (data) => {
   try {
-    const response = await axios.post(BASE_URL + "usuarios/", data)
+    // const response = await axios.post(BASE_URL + "usuarios/", data)
+    const response = await axios.post("usuarios/", data)
     return response.data;
   } catch (error) {
     console.log("No se pudo crear el usuario ", error);
@@ -45,7 +46,8 @@ export const signUp = async (data) => {
 }
 
 export const getUserInfo = async (token) => {
-  const response = await api.get(BASE_URL + "me", {
+  // const response = await api.get(BASE_URL + "me", {
+  const response = await api.get("me", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -56,7 +58,7 @@ export const getUserInfo = async (token) => {
 
 export const getCases = async (token) => {
   try {
-    const response = await api.get(BASE_URL + "casos", {
+    const response = await api.get("casos", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -73,7 +75,8 @@ export const getCases = async (token) => {
 
 export const createCase = async (token, caseData) => {
   try {
-    const response = await api.post(BASE_URL + "casos/", caseData, {
+    // const response = await api.post(BASE_URL + "casos/", caseData, {
+    const response = await api.post("casos/", caseData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -86,17 +89,9 @@ export const createCase = async (token, caseData) => {
   }
 };
 
-export const updateUserInfo = async (userUid, updatedFields) => {
-  const user = mockUsers.find((u) => u.uid === userUid);
-  if (user) {
-    Object.assign(user, updatedFields);
-    return true;
-  }
-  return false;
-};
-
 export const getCasesById = async (token, id) => {
-  const response = await api.get(BASE_URL + "casos/" + id, {
+  // const response = await api.get(BASE_URL + "casos/" + id, {
+  const response = await api.get("casos/" + id, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -105,8 +100,8 @@ export const getCasesById = async (token, id) => {
 };
 
 export const updateCaseById = async (token, id) => {
-  const response = await api.put(
-    BASE_URL + "casos/" + id.id,
+  // const response = await api.put(BASE_URL + "casos/" + id.id,
+  const response = await api.put("casos/" + id.id,
     {
       titulo: id.titulo,
       descripcion: id.descripcion,
@@ -121,7 +116,8 @@ export const updateCaseById = async (token, id) => {
 };
 
 export const deleteCases = async (token, id) => {
-  const response = await api.delete(BASE_URL + "casos/" + id, {
+  // const response = await api.delete(BASE_URL + "casos/" + id, {
+  const response = await api.delete("casos/" + id, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -130,8 +126,8 @@ export const deleteCases = async (token, id) => {
 };
 
 export const createRubricas = async (token, data, responseSave) => {
-  const response = await api.post(
-    BASE_URL + "rubricas/caso/" + responseSave.id,
+  // const response = await api.post(BASE_URL + "rubricas/caso/" + responseSave.id,
+  const response = await api.post("rubricas/caso/" + responseSave.id,
     {
       caso_id: responseSave.id,
       docente_id: responseSave.creador_id,
@@ -154,8 +150,8 @@ export const createRubricas = async (token, data, responseSave) => {
 };
 
 export const updateRubricaById = async (token, id) => {
-  console.log("id: ", id);
-  const response = await api.put( BASE_URL + "casos/" + id.id,
+  // const response = await api.put( BASE_URL + "casos/" + id.id,
+  const response = await api.put("casos/" + id.id,
     {
       titulo: id.titulo,
       descripcion: id.descripcion,
@@ -170,7 +166,8 @@ export const updateRubricaById = async (token, id) => {
 };
 
 export const getRubricaCriteriosById = async (token, id) => {
-  const response = await api.get( BASE_URL + "rubricas/caso/" + id, {
+  // const response = await api.get( BASE_URL + "rubricas/caso/" + id, {
+  const response = await api.get("rubricas/caso/" + id, {
     headers: {
         Authorization: `Bearer ${token}`,
     },
@@ -179,10 +176,8 @@ export const getRubricaCriteriosById = async (token, id) => {
 };
 
 export const updateRubricas = async (token, casoId, rubrica) => {
-
-  const response = await api.put(
-    BASE_URL + "rubricas/caso/" + casoId,
-    rubrica,
+  // const response = await api.put(BASE_URL + "rubricas/caso/" + casoId, rubrica,
+  const response = await api.put("rubricas/caso/" + casoId, rubrica,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -194,7 +189,8 @@ export const updateRubricas = async (token, casoId, rubrica) => {
 };
 
 export const createRespuesta = async (token, data) => {
-    const response = await api.post(BASE_URL + "entregas", data, {
+    // const response = await api.post(BASE_URL + "entregas", data, {
+    const response = await api.post("entregas", data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -203,7 +199,8 @@ export const createRespuesta = async (token, data) => {
 }
 
 export const getEntregasById = async (token, id) => {
-  const response = await api.get(BASE_URL + "entregas/" + id , {
+  // const response = await api.get(BASE_URL + "entregas/" + id , {
+  const response = await api.get("entregas/" + id , {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -212,7 +209,8 @@ export const getEntregasById = async (token, id) => {
 };
 
 export const getEntregasByCaso = async (token, id) => {
-  const response = await api.get(BASE_URL + "entregas/caso/" + id , {
+  // const response = await api.get(BASE_URL + "entregas/caso/" + id , {
+  const response = await api.get("entregas/caso/" + id , {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -221,7 +219,8 @@ export const getEntregasByCaso = async (token, id) => {
 };
 
 export const getMisEntregas = async (token) => {
-  const response = await api.get(BASE_URL + "entregas/MisEntregas", {
+  // const response = await api.get(BASE_URL + "entregas/MisEntregas", {
+  const response = await api.get("entregas/MisEntregas", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -230,7 +229,8 @@ export const getMisEntregas = async (token) => {
 };
 
 export const getEvaluacionById = async (token, id) => {
-  const response = await api.get(BASE_URL + "evaluaciones/MisEvaluaciones/" + id , {
+  // const response = await api.get(BASE_URL + "evaluaciones/MisEvaluaciones/" + id , {
+  const response = await api.get("evaluaciones/MisEvaluaciones/" + id , {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -239,7 +239,8 @@ export const getEvaluacionById = async (token, id) => {
 };
 
 export const getEstudiantes = async (token) => {
-  const response = await api.get(BASE_URL + "estudiantes",{
+  // const response = await api.get(BASE_URL + "estudiantes",{
+  const response = await api.get("estudiantes",{
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -249,7 +250,8 @@ export const getEstudiantes = async (token) => {
 }
 
 export const getUsuarioById = async (token, id) => {
-  const response = await api.get(BASE_URL + "usuarios/" + id, {
+  // const response = await api.get(BASE_URL + "usuarios/" + id, {
+  const response = await api.get("usuarios/" + id, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -258,7 +260,8 @@ export const getUsuarioById = async (token, id) => {
 }
 
 export const getEvaluaciones = async (token) => {
-  const response = await api.get(BASE_URL + "evaluaciones", {
+  // const response = await api.get(BASE_URL + "evaluaciones", {
+  const response = await api.get("evaluaciones", {
     headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -267,7 +270,8 @@ export const getEvaluaciones = async (token) => {
 }
 
 export const evaluarIa = async (token, entrega_id) => {
-  const response = await api.post(BASE_URL + "evaluaciones/evaluar-con-ia/" + entrega_id, null, {
+  // const response = await api.post(BASE_URL + "evaluaciones/evaluar-con-ia/" + entrega_id, null, {
+  const response = await api.post("evaluaciones/evaluar-con-ia/" + entrega_id, null, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
