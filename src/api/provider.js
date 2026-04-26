@@ -56,7 +56,7 @@ export const getUserInfo = async (token) => {
 
 export const getCases = async (token) => {
   try {
-    const response = await axios.get(BASE_URL + "casos", {
+    const response = await axios.get(BASE_URL + "casos/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
