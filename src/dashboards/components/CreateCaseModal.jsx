@@ -84,7 +84,7 @@ const handleAgregarCriterio = () => {
     nombre: "",
     descripcion: "",
     puntaje_maximo: 0,
-    orden: 0,
+    orden: "",
   });
 };
 

@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { UserContext } from "../../auth/context/UserContext";
 import MenuItem from "@mui/material/MenuItem";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const style = {
   position: "absolute",
@@ -44,6 +45,8 @@ export default function ViewCaseModalStudent({
   const estados = ["pendiente", "en_revision"];
   const [estado, setEstado] = useState("");
   const [typedText, setTypedText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const yaRespondio = (entregaRespuesta || "").length > 15;
 
   const idUser = user?.id;
@@ -55,7 +58,6 @@ export default function ViewCaseModalStudent({
       setTitle(onView.titulo || "");
       setIdEstudiante(idUser || 0);
 
-      // 👇 aquí está la clave
       setRespuesta(entregaRespuesta || "");
 
       setTypedText("");
@@ -63,13 +65,11 @@ export default function ViewCaseModalStudent({
   }, [onView, idUser, entregaRespuesta]);
 
   useEffect(() => {
-    // 🔥 prioridad: si ya respondió → mostrar observación
     if (yaRespondio && MyObservacion) {
       setTypedText(MyObservacion);
       return;
     }
 
-    // 🤖 si no, usa la IA
     if (!iaResult) return;
 
     const textoCompleto = `Nota final: ${iaResult.nota_total}
@@ -97,9 +97,19 @@ ${d.comentario_text}
     return () => clearInterval(interval);
   }, [iaResult, MyObservacion, entregaRespuesta]);
 
-  const handleCreate = () => {
-    onResponse({ caso_id, estudiante_id, respuesta });
-    // setRespuesta("");
+  const handleCreate = async () => {
+    if (loading || submitted) return;
+
+    setLoading(true);
+
+    try {
+      await onResponse({ caso_id, estudiante_id, respuesta });
+      setSubmitted(true);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -120,32 +130,44 @@ ${d.comentario_text}
           inputProps={{ minLength: 100 }}
         />
 
-        {(iaResult || yaRespondio) && (
-  <TextField
-    label={yaRespondio ? "Observación" : "Evaluación IA 🤖"}
-    value={typedText}
-    fullWidth
-    multiline
-    minRows={6} // 👈 tamaño base
-    maxRows={12} // 👈 crece pero con límite
-    InputProps={{
-      readOnly: true, // 👈 solo lectura (clave)
-    }}
-    sx={{
-      mt: 2,
-      background: "#f5f5f5",
-      borderRadius: 2,
-    }}
-  />
-)}
+        {loading ? (
+          <TextField
+            label="Evaluación IA 🤖"
+            value="Generando evaluación..."
+            fullWidth
+            multiline
+            minRows={6}
+            InputProps={{ readOnly: true }}
+            sx={{ mt: 2, background: "#f5f5f5", borderRadius: 2 }}
+          />
+        ) : (
+          (iaResult || yaRespondio) && (
+            <TextField
+              label={yaRespondio ? "Observación" : "Evaluación IA 🤖"}
+              value={typedText}
+              fullWidth
+              multiline
+              minRows={6}
+              maxRows={12}
+              InputProps={{ readOnly: true }}
+              sx={{ mt: 2, background: "#f5f5f5", borderRadius: 2 }}
+            />
+          )
+        )}
 
         <Button
           variant="contained"
           color="primary"
           onClick={handleCreate}
-          disabled={respuesta.trim().length < 100 || yaRespondio}
+          disabled={
+            respuesta.trim().length < 100 || yaRespondio || loading || submitted
+          }
         >
-          {yaRespondio ? "Ya respondiste este caso" : "Resolver Caso"}
+          {loading
+            ? "Generando..."
+            : submitted || yaRespondio
+              ? "Ya respondiste este caso"
+              : "Resolver Caso"}
         </Button>
 
         <Button variant="outlined" color="secondary" onClick={onClose}>
