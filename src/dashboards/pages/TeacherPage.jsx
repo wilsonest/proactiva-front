@@ -57,7 +57,6 @@ export default function TeacherPage() {
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openViewModal, setOpenViewModal] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
-  const [successAlert, setSuccessAlert] = useState(false);
   const [severity, setSeverity] = useState("success"); // success | error | warning | info
   const [messageAlert, setMessageAlert] = useState("");
 
@@ -132,29 +131,6 @@ export default function TeacherPage() {
     }
   }
 
-//   async function updateCaso(data){
-//   const token = JSON.parse(localStorage.getItem("Token"));
-
-//   if (!token?.access_token){
-//     console.log("No hay token");
-//     return;
-//   }
-
-//   try {
-
-//     await updateCase(token.access_token, data);
-//     await updateRubrica(token.access_token, data.id, data.rubrica);
-//     await loadCases(token.access_token);
-//     setMessageAlert("Caso actualizado exitosamente");
-//     setSuccessAlert(true);
-//     setOpenViewModal(false);
-
-//   } catch (error) {
-//     console.log("Error al actualizar:", error);
-//   }
-
-// }
-
 async function updateCaso(data) {
   const token = JSON.parse(localStorage.getItem("Token"));
 
@@ -175,7 +151,7 @@ async function updateCaso(data) {
 
   } catch (error) {
     if (error.response?.status === 403) {
-      setMessageAlert("No tienes permiso de editar este caso 🚫");
+      setMessageAlert("No tienes permiso de editar este caso");
       setSeverity("error");
     } else {
       setMessageAlert("Error al actualizar el caso");

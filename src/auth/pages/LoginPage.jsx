@@ -159,17 +159,23 @@ export function LoginPage() {
   const {login, userState: { errorMessage }, signUpWithEmail,} = useContext(UserContext);
   const [error, setErrorMessage] = useState("");
   const [openSignUpModal, setOpenSignUpModal] = useState(false);
-  const [successAlert, setSuccessAlert] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [severity, setSeverity] = useState("success"); // success | error | warning | info
+  const [messageAlert, setMessageAlert] = useState("");
 
   const providers = [{ id: "credentials", name: "Email and Password" }];
 
   async function crearUsuario(data) {
     try {
-      const crearUsuario = await signUpWithEmail(data);
-      setSuccessAlert(true); // <-- Mostrar alerta de éxito
-      setOpenSignUpModal(false); // <-- Cerrar modal
+        const crearUsuario = await signUpWithEmail(data);
+        setMessageAlert("Caso actualizado exitosamente");
+        setSeverity("success");
+        setOpenAlert(true);
+        setOpenSignUpModal(false);
     } catch (error) {
-      console.error("Error al crear caso:", error);
+        setMessageAlert(error.message);
+        setSeverity("error");
+        setOpenAlert(true);
     }
   }
 
@@ -223,18 +229,18 @@ export function LoginPage() {
       />
 
       <Snackbar
-        open={successAlert}
+        open={openAlert}
         autoHideDuration={4000}
-        onClose={() => setSuccessAlert(false)}
+        onClose={() => setOpenAlert(false)}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert
-          onClose={() => setSuccessAlert(false)}
-          severity="success"
+          onClose={() => setOpenAlert(false)}
+          severity={severity}
           variant="filled"
           sx={{ width: "100%" }}
         >
-          Usuario creado satisfactoriamente
+          {messageAlert}
         </Alert>
       </Snackbar>
     </AppProvider>

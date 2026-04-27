@@ -13,8 +13,8 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 800,
-  maxHeight: "90vh", // 🔥 límite de altura
-  overflowY: "auto", // 🔥 scroll vertical
+  maxHeight: "90vh", //límite de altura
+  overflowY: "auto", //scroll vertical
   bgcolor: "background.paper",
   border: "2px solid #1976d2",
   boxShadow: 24,
