@@ -10,11 +10,26 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 800,
+  
+  // 🔥 Responsive aquí
+  width: {
+    xs: "90%",   // móvil
+    sm: "80%",   // tablet
+    md: 500,     // laptop
+    lg: 600      // pantallas grandes
+  },
+
+  maxHeight: "90vh", // evita que se salga en móviles
+  overflowY: "auto", // scroll si se necesita
+
   bgcolor: "background.paper",
   border: "2px solid #1976d2",
   boxShadow: 24,
-  p: 4,
+  p: {
+    xs: 2,
+    sm: 3,
+    md: 4
+  },
   borderRadius: 2,
   display: "flex",
   flexDirection: "column",
@@ -43,7 +58,7 @@ export default function SignUp({ open, onClose, onCreate }) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} aria-labelledby="modal-signup">
+    <Modal open={open} onClose={onClose}>
       <Box sx={style}>
         <TextField
           label="Nombre"
@@ -72,6 +87,7 @@ export default function SignUp({ open, onClose, onCreate }) {
           select
           value={rol}
           onChange={(e) => setRol(e.target.value)}
+          fullWidth
         >
           {roles.map((r) => (
             <MenuItem key={r} value={r}>
@@ -80,13 +96,25 @@ export default function SignUp({ open, onClose, onCreate }) {
           ))}
         </TextField>
 
-        <Button variant="contained" onClick={handleCreate}>
-          Crear Usuario
-        </Button>
+        {/* 🔥 Botones responsive */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: {
+              xs: "column",
+              sm: "row"
+            },
+            gap: 1
+          }}
+        >
+          <Button variant="contained" onClick={handleCreate} fullWidth>
+            Crear Usuario
+          </Button>
 
-        <Button variant="outlined" onClick={onClose}>
+          <Button variant="outlined" onClick={onClose} fullWidth>
             Cerrar
-        </Button>
+          </Button>
+        </Box>
       </Box>
     </Modal>
   );
