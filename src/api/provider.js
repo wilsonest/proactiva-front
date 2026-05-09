@@ -40,11 +40,17 @@ export const signUp = async (data) => {
     return response.data;
 
   } catch (error) {
+    const detail = error.response?.data?.detail;
+    let mensaje = "Error al crear usuario";
 
-    const mensaje = error.response?.data?.detail || error;
+    if (typeof detail === "string") {
+      mensaje = detail;
+    } 
+
     throw new Error(mensaje);
   }
 };
+
 
 export const getUserInfo = async (token) => {
   // const response = await api.get(BASE_URL + "me", {
@@ -157,6 +163,7 @@ export const updateRubricaById = async (token, id) => {
   return response.data;
 };
 
+
 export const getRubricaCriteriosById = async (token, id) => {
   const response = await api.get("rubricas/caso/" + id, {
     headers: {
@@ -258,3 +265,29 @@ export const evaluarIa = async (token, entrega_id) => {
   });
   return response.data
 }
+
+export const analizarDocumento = async (token, archivo) => {
+  const formData = new FormData();
+  formData.append("archivo", archivo);
+
+  const response = await api.post("carga-caso/analizar-documento", formData);
+  return response.data;
+};
+
+export const confirmarCaso = async (token, data) => {
+  const response = await api.post("carga-caso/confirmar-caso", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const getEvaluacionDetalle = async (token, evaluacionId) => {
+  const response = await api.get("evaluaciones/" + evaluacionId, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
