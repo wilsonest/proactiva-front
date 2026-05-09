@@ -2,6 +2,7 @@ import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import React, { useContext, useEffect, useState } from "react";
+import UploadCaseModal from "../components/UploadCaseModal";
 // Cambio: Importar Snackbar y Alert de Material UI
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
@@ -59,6 +60,7 @@ export default function TeacherPage() {
   const [openAlert, setOpenAlert] = useState(false);
   const [severity, setSeverity] = useState("success"); // success | error | warning | info
   const [messageAlert, setMessageAlert] = useState("");
+  const [openUploadModal, setOpenUploadModal] = useState(false);
 
   const { logout } = useContext(UserContext);
   const { getAllCases, createCases, updateCase, getCaseById, deleteCase, createRubrica, getRyCbyId, updateRubrica } = useContext(CasesContext);
@@ -223,6 +225,12 @@ async function updateCaso(data) {
               >
                 <ListItemText primary="Crear Caso" />
               </ListItemButton>
+              <ListItemButton
+                  sx={{ pl: 4 }}
+                  onClick={() => setOpenUploadModal(true)}
+              >
+                <ListItemText primary="Cargar desde Documento" />
+              </ListItemButton>
             </List>
           </Collapse>
 
@@ -273,7 +281,17 @@ async function updateCaso(data) {
         onClose={() => setOpenCreateModal(false)}
         onCreate={crearCaso}
       />
-
+      <UploadCaseModal
+        open={openUploadModal}
+        onClose={() => setOpenUploadModal(false)}
+        onSuccess={() => {
+          const token = JSON.parse(localStorage.getItem("Token"));
+          if (token) loadCases(token.access_token);
+          setMessageAlert("Caso creado desde documento exitosamente");
+          setSeverity("success");
+          setOpenAlert(true);
+        }}
+      />
       {/* Cambio: Snackbar */}
       <Snackbar
   open={openAlert}

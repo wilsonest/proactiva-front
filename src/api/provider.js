@@ -157,6 +157,7 @@ export const updateRubricaById = async (token, id) => {
   return response.data;
 };
 
+
 export const getRubricaCriteriosById = async (token, id) => {
   const response = await api.get("rubricas/caso/" + id, {
     headers: {
@@ -258,3 +259,20 @@ export const evaluarIa = async (token, entrega_id) => {
   });
   return response.data
 }
+
+export const analizarDocumento = async (token, archivo) => {
+  const formData = new FormData();
+  formData.append("archivo", archivo);
+
+  const response = await api.post("carga-caso/analizar-documento", formData);
+  return response.data;
+};
+
+export const confirmarCaso = async (token, data) => {
+  const response = await api.post("carga-caso/confirmar-caso", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
