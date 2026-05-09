@@ -40,11 +40,17 @@ export const signUp = async (data) => {
     return response.data;
 
   } catch (error) {
+    const detail = error.response?.data?.detail;
+    let mensaje = "Error al crear usuario";
 
-    const mensaje = error.response?.data?.detail || error;
+    if (typeof detail === "string") {
+      mensaje = detail;
+    } 
+
     throw new Error(mensaje);
   }
 };
+
 
 export const getUserInfo = async (token) => {
   // const response = await api.get(BASE_URL + "me", {
