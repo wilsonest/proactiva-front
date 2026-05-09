@@ -276,3 +276,12 @@ export const confirmarCaso = async (token, data) => {
   });
   return response.data;
 };
+
+export const getEvaluacionDetalle = async (token, evaluacionId) => {
+  const response = await api.get("evaluaciones/" + evaluacionId, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
