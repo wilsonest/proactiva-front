@@ -138,10 +138,7 @@ export default function StudentPage() {
     try {
       const caso = await getCaseById(token.access_token, id);
 
-      const entrega = await getEntregaByCasos(
-        token.access_token,
-        caso.id
-      );
+      const entrega = await getEntregaByCasos(token.access_token, caso.id);
 
       const entregaId = entrega?.[0]?.id;
 
@@ -150,15 +147,10 @@ export default function StudentPage() {
       let observacion = "";
 
       if (entregaId) {
-        const Myevaluacion = await getEvaluacionesByEstudiante(
-          token.access_token,
-          entregaId
-        );
 
-        observacion =
-          Myevaluacion?.observaciones_text ||
-          Myevaluacion?.[0]?.observaciones_text ||
-          "";
+        const Myevaluacion = await getEvaluacionesByEstudiante(token.access_token, entregaId);
+        observacion = Myevaluacion?.observaciones_text || Myevaluacion?.[0]?.observaciones_text || "";
+        
       }
 
       setMyObservacion(observacion);

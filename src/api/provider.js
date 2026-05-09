@@ -196,7 +196,7 @@ export const getEntregasById = async (token, id) => {
 };
 
 export const getEntregasByCaso = async (token, id) => {
-  const response = await api.get("entregas/caso/" + id , {
+  const response = await api.get("entregas/caso/" + id + "/mis-entregas", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -205,7 +205,7 @@ export const getEntregasByCaso = async (token, id) => {
 };
 
 export const getMisEntregas = async (token) => {
-  const response = await api.get("entregas/MisEntregas/", {
+  const response = await api.get("entregas/MisEntregas", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
