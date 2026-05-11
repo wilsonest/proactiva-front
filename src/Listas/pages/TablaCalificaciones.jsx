@@ -40,16 +40,22 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
-    transition: theme.transitions.create("margin", {
+    transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+
+    marginLeft: 0,
+    width: "100%",
+
     ...(open && {
-      transition: theme.transitions.create("margin", {
+      marginLeft: `${drawerWidth}px`,
+      width: `calc(100% - ${drawerWidth}px)`,
+
+      transition: theme.transitions.create(["margin", "width"], {
         easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
       }),
-      marginLeft: 0,
     }),
   })
 );
@@ -376,6 +382,7 @@ export default function ListaAllCalificaciones() {
   return (
     <>
       <CssBaseline />
+      
 
       <Drawer
         sx={{
@@ -462,7 +469,7 @@ export default function ListaAllCalificaciones() {
           }}
         />
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
-          <TableContainer>
+          <TableContainer  sx={{maxHeight: "75vh", overflowY: "auto",}}>
             <Table stickyHeader aria-label="tabla calificaciones">
               <TableHead>
                 <TableRow>
