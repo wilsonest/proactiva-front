@@ -18,13 +18,15 @@ const style = {
   transform: "translate(-50%, -50%)",
   width: 800,
   bgcolor: "background.paper",
-  border: "2px solid #1976d2",
+  // border: "2px solid #1976d2",
   boxShadow: 24,
   p: 4,
   borderRadius: 2,
   display: "flex",
   flexDirection: "column",
   gap: 2,
+  maxHeight: "95vh", //límite de altura
+  overflowY: "auto", //scroll vertical
 };
 
 export default function ViewCaseModal({open, onClose, onView, ryc, onUpdate,}) {
@@ -219,6 +221,7 @@ export default function ViewCaseModal({open, onClose, onView, ryc, onUpdate,}) {
                   <Checkbox
                     checked={publica}
                     onChange={(e) => setPublica(e.target.checked)}
+                    style={{ color: "darkgreen" }}
                   />
                 }
                 label="Pública"
@@ -229,6 +232,7 @@ export default function ViewCaseModal({open, onClose, onView, ryc, onUpdate,}) {
                   <Checkbox
                     checked={vigente}
                     onChange={(e) => setVigente(e.target.checked)}
+                    style={{ color: "darkgreen" }}
                   />
                 }
                 label="Vigente"
@@ -239,6 +243,7 @@ export default function ViewCaseModal({open, onClose, onView, ryc, onUpdate,}) {
                   <Checkbox
                     checked={autoEvaluacion}
                     onChange={(e) => setAutoEvaluacion(e.target.checked)}
+                    style={{ color: "darkgreen" }}
                   />
                 }
                 label="Auto evaluación"
@@ -250,6 +255,7 @@ export default function ViewCaseModal({open, onClose, onView, ryc, onUpdate,}) {
                 variant="contained"
                 disabled={!formCompleto}
                 onClick={() => setOpenCriterios(true)}
+                style={{ backgroundColor: "darkgreen", color: "white" }}
               >
                 Criterios
               </Button>
@@ -258,11 +264,12 @@ export default function ViewCaseModal({open, onClose, onView, ryc, onUpdate,}) {
                 variant="contained"
                 color="primary"
                 onClick={handleCreate}
+                style={{ backgroundColor: "darkgreen", color: "white" }}
               >
                 Editar Caso
               </Button>
               {}
-              <Button variant="outlined" color="secondary" onClick={onClose}>
+              <Button variant="outlined" color="secondary" onClick={onClose} style={{ color: "darkgreen" }}>
                 Cerrar
               </Button>
             </Box>
@@ -280,6 +287,7 @@ export default function ViewCaseModal({open, onClose, onView, ryc, onUpdate,}) {
             onChange={(e) =>
               setNuevoCriterio({ ...nuevoCriterio, nombre: e.target.value })
             }
+            
             fullWidth
           />
 
@@ -331,7 +339,7 @@ export default function ViewCaseModal({open, onClose, onView, ryc, onUpdate,}) {
               ))}
           </TextField>
 
-          <Button variant="contained" onClick={handleAgregarCriterio}>
+          <Button variant="contained" onClick={handleAgregarCriterio} style={{ backgroundColor: "darkgreen", color: "white" }}>
             Agregar
           </Button>
 
@@ -373,7 +381,7 @@ export default function ViewCaseModal({open, onClose, onView, ryc, onUpdate,}) {
             ))}
           </Box>
 
-          <Button variant="outlined" onClick={() => setOpenCriterios(false)}>
+          <Button variant="outlined" onClick={() => setOpenCriterios(false)} style={{ color: "darkgreen", borderColor: "darkgreen" }}>
             Guardar
           </Button>
         </Box>

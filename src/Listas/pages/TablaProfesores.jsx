@@ -116,10 +116,7 @@ export default function ProfesoresTable() {
           await Promise.all(
             entregas.map(async (entrega) => {
               try {
-                const evaluacion = await getEvaluacionesByEstudiante(
-                  token.access_token,
-                  entrega.id,
-                );
+                const evaluacion = await getEvaluacionesByEstudiante(token.access_token, entrega.id,);
 
                 if (evaluacion?.nota_total >= 3) {
                   aprobados++;

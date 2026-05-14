@@ -357,8 +357,8 @@ async function updateCaso(data) {
                       padding: "6px 16px",
                       margin: "6px",
                       borderRadius: 4,
-                      border: "1px solid #1976d2",
-                      color: "#1976d2",
+                      border: "1px solid darkgreen",
+                      color: "darkgreen",
                       background: "transparent",
                       cursor: "pointer",
                     }}
@@ -383,10 +383,10 @@ async function updateCaso(data) {
                     borderRadius: 4,
                     border:
                       page === currentPage
-                        ? "2px solid #1976d2"
+                        ? "2px solid darkgreen"
                         : "1px solid #ccc",
-                    background: page === currentPage ? "#1976d2" : "#fff",
-                    color: page === currentPage ? "#fff" : "#1976d2",
+                    background: page === currentPage ? "darkgreen" : "#fff",
+                    color: page === currentPage ? "#fff" : "darkgreen",
                     cursor: "pointer",
                     fontWeight: page === currentPage ? "bold" : "normal",
                   }}

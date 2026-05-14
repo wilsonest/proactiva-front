@@ -1,4 +1,4 @@
-import { getCasesById, getEntregasById, getUsuarioById, getEstudiantes, getEvaluacionById, getEvaluaciones, getMisEntregas, getCases, getEntregasByCaso } from "../../api/provider"
+import { getCasesById, getEntregasById, getUsuarioById, getEstudiantes, getEvaluacionById, getEvaluaciones, getMisEntregas, getCases, getEntregasByCaso, getAllEntregasByCaso } from "../../api/provider"
 import { entregaTypes } from "../types/entregaTypes";
 import { evaluacionTypes } from "../types/evaluacionTypes";
 
@@ -20,7 +20,7 @@ export const useEntregas = (dispatch) => {
 
         const getEntregasByCasoId = async (Token, id) => {
         try {
-            const response = await getEntregasByCaso(Token, id);
+            const response = await getAllEntregasByCaso(Token, id);
             const action = {
                 type: entregaTypes.getEntregasByUser,
                 payload:response,

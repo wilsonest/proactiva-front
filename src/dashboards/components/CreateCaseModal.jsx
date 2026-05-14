@@ -177,17 +177,17 @@ const handleAgregarCriterio = () => {
 
           <Box>
             <FormControlLabel
-              control={<Checkbox checked={publica} onChange={(e) => setPublica(e.target.checked)} />}
+              control={<Checkbox checked={publica} onChange={(e) => setPublica(e.target.checked)} style={{ color: "darkgreen" }} />}
               label="Pública"
             />
 
             <FormControlLabel
-              control={<Checkbox checked={vigente} onChange={(e) => setVigente(e.target.checked)} />}
+              control={<Checkbox checked={vigente} onChange={(e) => setVigente(e.target.checked)} style={{ color: "darkgreen" }}/>}
               label="Vigente"
             />
 
             <FormControlLabel
-              control={<Checkbox checked={autoEvaluacion} onChange={(e) => setAutoEvaluacion(e.target.checked)} />}
+              control={<Checkbox checked={autoEvaluacion} onChange={(e) => setAutoEvaluacion(e.target.checked)} style={{ color: "darkgreen" }}/>}
               label="Auto evaluación"
             />
           </Box>
@@ -210,7 +210,7 @@ const handleAgregarCriterio = () => {
               Crear Caso
             </Button>
 
-            <Button variant="outlined" onClick={onClose}>
+            <Button variant="outlined" onClick={onClose} style={{ color: "darkgreen" }}>
               Cerrar
             </Button>
 
@@ -267,7 +267,7 @@ const handleAgregarCriterio = () => {
               ))}
           </TextField>
 
-          <Button variant="contained" onClick={handleAgregarCriterio}>
+          <Button variant="contained" onClick={handleAgregarCriterio} style={{ backgroundColor: "darkgreen", color: "white" }}>
             Agregar
           </Button>
 
@@ -316,10 +316,7 @@ const handleAgregarCriterio = () => {
 </Box>
 
 
-          <Button
-            variant="outlined"
-            onClick={() => setOpenCriterios(false)}
-          >
+          <Button variant="outlined" onClick={() => setOpenCriterios(false)} style={{ color: "darkgreen", borderColor: "darkgreen" }}>
             Guardar
           </Button>
 

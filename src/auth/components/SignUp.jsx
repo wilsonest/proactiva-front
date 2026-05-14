@@ -23,7 +23,7 @@ const style = {
   overflowY: "auto", // scroll si se necesita
 
   bgcolor: "background.paper",
-  border: "2px solid #1976d2",
+  border: "2px solid darkgreen",
   boxShadow: 24,
   p: {
     xs: 2,
@@ -107,11 +107,11 @@ export default function SignUp({ open, onClose, onCreate }) {
             gap: 1
           }}
         >
-          <Button variant="contained" onClick={handleCreate} fullWidth>
+          <Button variant="contained" onClick={handleCreate} fullWidth style={{ backgroundColor: "darkgreen", color: "white" }}>
             Crear Usuario
           </Button>
 
-          <Button variant="outlined" onClick={onClose} fullWidth>
+          <Button variant="outlined" onClick={onClose} fullWidth style={{ color: "darkgreen", borderColor: "darkgreen" }}>
             Cerrar
           </Button>
         </Box>

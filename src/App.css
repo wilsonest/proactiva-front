@@ -51,7 +51,7 @@ html, body {
 
 body {
   overflow: hidden;
-  background-image: url("./images/imagenTDEA.png"); /* ruta de la imagen */
+  background-image: url("./images/imagenTDEA.png");
   background-size: cover;       /* hace que cubra toda la pantalla */
   background-position: center;  /* centra la imagen */
   background-repeat: no-repeat; /* evita que se repita */

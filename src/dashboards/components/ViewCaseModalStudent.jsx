@@ -13,16 +13,18 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 800,
-  maxHeight: "90vh", //límite de altura
+  maxHeight: "95vh", //límite de altura
   overflowY: "auto", //scroll vertical
   bgcolor: "background.paper",
-  border: "2px solid #1976d2",
+  // border: "2px solid ",
   boxShadow: 24,
+  // boxShadow: "0 0 25px rgba(0,100,0,0.25)",
   p: 4,
-  borderRadius: 2,
+  borderRadius: 3,
   display: "flex",
   flexDirection: "column",
   gap: 2,
+  // scrollbarColor: "darkgreen #000000",
 };
 
 export default function ViewCaseModalStudent({
@@ -128,6 +130,7 @@ ${d.comentario_text}
           multiline
           minRows={4}
           inputProps={{ minLength: 100 }}
+          
         />
 
         {loading ? (
@@ -170,7 +173,7 @@ ${d.comentario_text}
               : "Resolver Caso"}
         </Button>
 
-        <Button variant="outlined" color="secondary" onClick={onClose}>
+        <Button variant="outlined" color="secondary" onClick={onClose} style={{ color: "darkgreen", borderRadius: "darkgreen" }}>
           Cerrar
         </Button>
       </Box>
