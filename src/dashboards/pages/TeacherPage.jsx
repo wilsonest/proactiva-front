@@ -356,7 +356,7 @@ async function updateCaso(data) {
                   }}
                 >
                   <h3>{caseItem.titulo}</h3>
-                  <p>{caseItem.descripcion.slice(0, 20)}</p>
+                  <p>{caseItem.descripcion.slice(0, 40)} ...</p>
                   <button
                     style={{
                       padding: "6px 16px",
