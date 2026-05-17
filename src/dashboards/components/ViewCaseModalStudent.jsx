@@ -130,7 +130,6 @@ ${d.comentario_text}
           multiline
           minRows={4}
           inputProps={{ minLength: 100 }}
-          
         />
 
         {loading ? (
@@ -160,11 +159,36 @@ ${d.comentario_text}
 
         <Button
           variant="contained"
-          color="primary"
           onClick={handleCreate}
           disabled={
             respuesta.trim().length < 100 || yaRespondio || loading || submitted
           }
+          sx={{
+            backgroundColor:
+              respuesta.trim().length >= 100 &&
+              !yaRespondio &&
+              !loading &&
+              !submitted
+                ? "darkgreen"
+                : "#bdbdbd",
+
+            color: "white",
+
+            "&:hover": {
+              backgroundColor:
+                respuesta.trim().length >= 100 &&
+                !yaRespondio &&
+                !loading &&
+                !submitted
+                  ? "#006400"
+                  : "#bdbdbd",
+            },
+
+            "&.Mui-disabled": {
+              backgroundColor: "#bdbdbd",
+              color: "#ffffff",
+            },
+          }}
         >
           {loading
             ? "Generando..."
@@ -173,7 +197,12 @@ ${d.comentario_text}
               : "Resolver Caso"}
         </Button>
 
-        <Button variant="outlined" color="secondary" onClick={onClose} style={{ color: "darkgreen", borderRadius: "darkgreen" }}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={onClose}
+          style={{ color: "darkgreen", borderRadius: "darkgreen" }}
+        >
           Cerrar
         </Button>
       </Box>

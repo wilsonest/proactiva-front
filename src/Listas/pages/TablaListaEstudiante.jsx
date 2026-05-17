@@ -219,7 +219,9 @@ export default function ListaEstudiante() {
             width: "100%",
             marginBottom: "10px",
             color: 'black',
-            background: 'white'
+            background: 'white',
+            borderColor: "darkgreen", 
+            borderWidth: "2px"
           }}
         />
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
@@ -232,7 +234,7 @@ export default function ListaEstudiante() {
                     <TableCell
                       key={column.id}
                       align={column.align}
-                      style={{ minWidth: column.minWidth }}
+                      style={{ minWidth: column.minWidth, fontWeight: "bold", }}
                     >
                       {column.label}
                     </TableCell>

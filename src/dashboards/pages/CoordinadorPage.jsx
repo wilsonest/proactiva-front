@@ -289,7 +289,9 @@ export default function CoordinadorPage() {
                 marginTop: 8,
                 marginBottom: 8,
                 color: 'black',
-                background: 'white'
+                background: 'white',
+                borderColor: "darkgreen",
+                borderWidth: "2px"
               }}
             />
           </Box>
@@ -307,6 +309,8 @@ export default function CoordinadorPage() {
                     border: "1px solid #e0e0e0",
                     borderRadius: 2,
                     background: "#fff",
+                    borderColor: "darkgreen", 
+                    borderWidth: "2px"
                   }}
                 >
                   <h3>{caseItem.titulo}</h3>
@@ -333,6 +337,8 @@ export default function CoordinadorPage() {
                       color: "#ffffff",
                       background: "red",
                       cursor: "pointer",
+                      borderColor: "darkgreen",
+                      borderWidth: "2px"
                     }}
                     onClick={() => deleteC(caseItem.id)}
                   >

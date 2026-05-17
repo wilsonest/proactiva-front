@@ -281,6 +281,8 @@ export default function StudentPage() {
                 marginBottom: 8,
                 color: "black",
                 background: "white",
+                borderColor: "darkgreen",
+                borderWidth: "2px"
               }}
             />
           </Box>
@@ -300,6 +302,8 @@ export default function StudentPage() {
                     border: "1px solid #e0e0e0",
                     borderRadius: 2,
                     background: "#fff",
+                    borderColor: "darkgreen", 
+                    borderWidth: "2px"
                   }}
                 >
                   <h3>{caseItem.titulo}</h3>

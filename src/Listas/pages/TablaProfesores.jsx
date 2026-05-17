@@ -241,6 +241,8 @@ export default function ProfesoresTable() {
             marginBottom: "10px",
             color: "black",
             background: "white",
+            borderColor: "darkgreen", 
+            borderWidth: "2px"
           }}
         />
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
@@ -253,7 +255,7 @@ export default function ProfesoresTable() {
                     <TableCell
                       key={column.id}
                       align={column.align}
-                      style={{ minWidth: column.minWidth }}
+                      style={{ minWidth: column.minWidth, fontWeight: "bold",}}
                     >
                       {column.label}
                     </TableCell>

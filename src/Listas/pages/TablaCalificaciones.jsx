@@ -466,6 +466,8 @@ export default function ListaAllCalificaciones() {
             marginBottom: "10px",
             color: "black",
             background: "white",
+            borderColor: "darkgreen", 
+            borderWidth: "2px"
           }}
         />
         <Paper sx={{ width: "100%", overflow: "hidden" }}>

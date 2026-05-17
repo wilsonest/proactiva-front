@@ -123,7 +123,8 @@ export default function TeacherPage() {
         await createRubrica(token.access_token,data,guardar);
         await loadCases(token.access_token);
         setMessageAlert("Caso creado exitosamente");
-        setSuccessAlert(true); // <-- Mostrar alerta de éxito
+        setSeverity("success");
+        setOpenAlert(true);
         setOpenCreateModal(false); // <-- Cerrar modal
       } catch (error) {
         console.error("Error al crear caso:", error);
@@ -330,7 +331,9 @@ async function updateCaso(data) {
                 marginTop: 8,
                 marginBottom: 8,
                 color: 'black',
-                background: 'white'
+                background: 'white',
+                borderColor: "darkgreen",
+                borderWidth: "2px"
               }}
             />
           </Box>
@@ -348,6 +351,8 @@ async function updateCaso(data) {
                     border: "1px solid #e0e0e0",
                     borderRadius: 2,
                     background: "#fff",
+                    borderColor: "darkgreen",
+                    borderWidth: "2px"
                   }}
                 >
                   <h3>{caseItem.titulo}</h3>
