@@ -33,6 +33,7 @@ const columns = [
   { id: "titulo", label: "Caso", minWidth: 170 },
   { id: "estado", label: "Estado", minWidth: 100 },
   { id: "nota", label: "Nota", minWidth: 170 },
+  { id: "retroalimentacion", label: "Retroalimentación", minWidth: 500 },
 ];
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
@@ -108,6 +109,7 @@ export default function ListaEstudiante() {
             titulo: caso?.titulo ?? "Sin título",
             estado: evaluacion?.estado ?? "Sin evaluar",
             nota: evaluacion?.nota_total ?? "-",
+            retroalimentacion: evaluacion?.observaciones_text ?? "Sin retroalimentación",
           };
         }),
       );

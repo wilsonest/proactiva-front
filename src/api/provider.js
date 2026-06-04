@@ -150,7 +150,7 @@ export const createRubricas = async (token, data, responseSave) => {
 };
 
 export const updateRubricaById = async (token, id) => {
-  const response = await api.put("casos/" + id.id,{
+  const response = await api.put("rubricas/caso/" + id.id,{
       titulo: id.titulo,
       descripcion: id.descripcion,
     },
