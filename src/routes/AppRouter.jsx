@@ -8,7 +8,7 @@ import TeacherPage from "../dashboards/pages/TeacherPage";
 import CoordinadorPage from "../dashboards/pages/CoordinadorPage";
 import ListaEstudiante from "../Listas/pages/TablaListaEstudiante";
 import ListaAllEstudiante from "../Listas/pages/TablaRegistroEstudiantes";
-import ListaAllCalificaciones from "../Listas/pages/TablaCalificaciones";
+import ListaAllCalificaciones from "../dashboards/pages/ListaAllCalificaciones";
 import ProfesoresTable from "../Listas/pages/TablaProfesores";
 
 

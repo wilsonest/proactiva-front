@@ -300,3 +300,12 @@ export const getEvaluacionDetalle = async (token, evaluacionId) => {
   });
   return response.data;
 };
+
+export const updateEvaluacion = async (token, evaluacionId, data) => {
+  const response = await api.put("evaluaciones/" + evaluacionId, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
