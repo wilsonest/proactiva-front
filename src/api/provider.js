@@ -150,7 +150,7 @@ export const createRubricas = async (token, data, responseSave) => {
 };
 
 export const updateRubricaById = async (token, id) => {
-  const response = await api.put("rubricas/caso/" + id.id,{
+  const response = await api.put("casos/" + id.id,{
       titulo: id.titulo,
       descripcion: id.descripcion,
     },
@@ -203,7 +203,16 @@ export const getEntregasById = async (token, id) => {
 };
 
 export const getEntregasByCaso = async (token, id) => {
-  const response = await api.get("entregas/caso/" + id , {
+  const response = await api.get("entregas/caso/" + id + "/mis-entregas", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const getAllEntregasByCaso = async (token, id) => {
+  const response = await api.get("entregas/caso/" + id, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -212,7 +221,7 @@ export const getEntregasByCaso = async (token, id) => {
 };
 
 export const getMisEntregas = async (token) => {
-  const response = await api.get("entregas/MisEntregas/", {
+  const response = await api.get("entregas/MisEntregas", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -285,6 +294,15 @@ export const confirmarCaso = async (token, data) => {
 
 export const getEvaluacionDetalle = async (token, evaluacionId) => {
   const response = await api.get("evaluaciones/" + evaluacionId, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const updateEvaluacion = async (token, evaluacionId, data) => {
+  const response = await api.put("evaluaciones/" + evaluacionId, data, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
