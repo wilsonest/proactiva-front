@@ -77,6 +77,7 @@ export default function ListaAllCalificaciones() {
   const [tableInfo, setTableInfo] = useState([]);
   const [open, setOpen] = useState(true);
   const [openCasos, setOpenCasos] = useState(false);
+  const { logout } = useContext(UserContext);
   const [page, setPage] = useState(0);
   const {
     getAllCalificaciones,
