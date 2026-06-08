@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box, Typography, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Chip, Button, CircularProgress,
@@ -8,7 +8,10 @@ import MuiAlert from "@mui/material/Alert";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import { useNavigate } from "react-router-dom";
-import { getEvaluaciones, getEvaluacionDetalle, updateEvaluacion } from "../../api/provider";
+import {
+  getEvaluaciones, getEvaluacionDetalle, updateEvaluacion,
+  getEntregasById, getCasesById, getUsuarioById
+} from "../../api/provider";
 import ReviewEvaluationModal from "../components/ReviewEvaluationModal";
 
 export default function ListaAllCalificaciones() {
@@ -30,8 +33,32 @@ export default function ListaAllCalificaciones() {
     try {
       const token = JSON.parse(localStorage.getItem("Token"));
       if (!token?.access_token) return;
+
       const data = await getEvaluaciones(token.access_token);
-      setEvaluaciones(data || []);
+
+      // Enriquecer cada evaluación con nombre del estudiante y título del caso
+      const enriquecidas = await Promise.all(
+        (data || []).map(async (ev) => {
+          try {
+            const entrega = await getEntregasById(token.access_token, ev.entrega_id);
+            const caso = await getCasesById(token.access_token, entrega.caso_id);
+            const estudiante = await getUsuarioById(token.access_token, entrega.estudiante_id);
+            return {
+              ...ev,
+              caso_titulo: caso?.titulo || "—",
+              estudiante_nombre: estudiante?.nombre_usuario || estudiante?.correo_electronico || "—",
+            };
+          } catch {
+            return {
+              ...ev,
+              caso_titulo: "—",
+              estudiante_nombre: "—",
+            };
+          }
+        })
+      );
+
+      setEvaluaciones(enriquecidas);
     } catch (e) {
       console.error("Error cargando evaluaciones:", e);
     } finally {
@@ -83,7 +110,7 @@ export default function ListaAllCalificaciones() {
   };
 
   const filtradas = evaluaciones.filter((ev) => {
-    const nombre = (ev.estudiante_nombre || String(ev.entrega_id) || "").toLowerCase();
+    const nombre = (ev.estudiante_nombre || "").toLowerCase();
     const caso = (ev.caso_titulo || "").toLowerCase();
     const term = searchTerm.toLowerCase();
     return nombre.includes(term) || caso.includes(term);
@@ -101,7 +128,7 @@ export default function ListaAllCalificaciones() {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1100, margin: "0 auto" }}>
+    <Box sx={{ p: 3, maxWidth: 1200, margin: "0 auto" }}>
       {/* Header */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}>
         <IconButton onClick={() => navigate(-1)} sx={{ color: "darkgreen" }}>
@@ -133,7 +160,8 @@ export default function ListaAllCalificaciones() {
             <TableHead sx={{ background: "darkgreen" }}>
               <TableRow>
                 <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>ID</TableCell>
-                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Entrega</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Estudiante</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Caso</TableCell>
                 <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Nota</TableCell>
                 <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Fecha</TableCell>
                 <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Evaluado por</TableCell>
@@ -144,7 +172,7 @@ export default function ListaAllCalificaciones() {
             <TableBody>
               {filtradas.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ color: "gray" }}>
+                  <TableCell colSpan={8} align="center" sx={{ color: "gray" }}>
                     No hay evaluaciones registradas.
                   </TableCell>
                 </TableRow>
@@ -152,7 +180,16 @@ export default function ListaAllCalificaciones() {
                 filtradas.map((ev, i) => (
                   <TableRow key={ev.id} sx={{ background: i % 2 === 0 ? "#fff" : "#f5faf6" }}>
                     <TableCell>{ev.id}</TableCell>
-                    <TableCell>{ev.entrega_id}</TableCell>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight="bold" color="darkgreen">
+                        {ev.estudiante_nombre || "—"}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {ev.caso_titulo || "—"}
+                      </Typography>
+                    </TableCell>
                     <TableCell>
                       <Typography fontWeight="bold" sx={{ color: getNotaColor(ev.nota_total) }}>
                         {Number(ev.nota_total).toFixed(1)}
@@ -199,7 +236,6 @@ export default function ListaAllCalificaciones() {
         </TableContainer>
       )}
 
-      {/* Modal de revisión */}
       <ReviewEvaluationModal
         open={openReview}
         onClose={() => setOpenReview(false)}
@@ -207,7 +243,6 @@ export default function ListaAllCalificaciones() {
         onConfirm={handleConfirmar}
       />
 
-      {/* Snackbar */}
       <Snackbar
         open={openAlert}
         autoHideDuration={4000}

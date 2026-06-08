@@ -108,8 +108,16 @@ export default function ListaEstudiante() {
           return {
             titulo: caso?.titulo ?? "Sin título",
             estado: evaluacion?.estado ?? "Sin evaluar",
-            nota: evaluacion?.nota_total ?? "-",
-            retroalimentacion: evaluacion?.observaciones_text ?? "Sin retroalimentación",
+            nota: evaluacion?.estado === "final" 
+              ? evaluacion?.nota_total 
+              : evaluacion?.estado === "revisada" 
+                ? "En revisión" 
+                : "-",
+            retroalimentacion: evaluacion?.estado === "final"
+              ? evaluacion?.observaciones_text
+              : evaluacion?.estado === "revisada"
+              ? "Evaluación pendiente de confirmación por el docente"
+              : "Sin retroalimentación",
           };
         }),
       );

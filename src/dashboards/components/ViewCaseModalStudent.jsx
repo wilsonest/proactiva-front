@@ -67,10 +67,18 @@ export default function ViewCaseModalStudent({
 
   useEffect(() => {
     if (yaRespondio && MyObservacion) {
-      setTypedText(MyObservacion);
+      if (iaResult?.estado === "final") {
+        setTypedText(MyObservacion);
+      } else if (iaResult?.estado === "revisada" || iaResult?.estado === "borrador") {
+        setTypedText("Tu entrega está siendo revisada por el docente. La retroalimentación estará disponible una vez confirmada la calificación.");
+      }
       return;
     }
     if (!iaResult) return;
+    if (iaResult.estado !== "final") {
+      setTypedText("Tu entrega está siendo revisada por el docente. La retroalimentación estará disponible una vez confirmada la calificación.");
+      return;
+      }
 
     const textoCompleto = `Nota final: ${iaResult.nota_total}\n\n${iaResult.detalles
       .map((d, i) => `Criterio ${i + 1}:\n${d.comentario_text}\n(Puntaje: ${d.puntaje_numerico})`)
