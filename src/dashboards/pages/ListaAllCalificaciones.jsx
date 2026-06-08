@@ -128,7 +128,6 @@ export default function ListaAllCalificaciones() {
           };
         }),
       );
-      console.log("tableData",tableData);
       setTableInfo(tableData);
 
       // setEvaluaciones(calificaciones || []);

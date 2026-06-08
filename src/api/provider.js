@@ -14,7 +14,6 @@ export const loginUser = async (email, password) => {
       },
     });
     const tokenData = response.data;
-    console.log(tokenData)
     // const expirationTime = new Date().getTime() + tokenData.tiempo_expiracion  * 60 * 1000; // Convertir a milisegundos
     localStorage.setItem("Token", JSON.stringify({...tokenData,})
         // expirationTime,
