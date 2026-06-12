@@ -134,7 +134,7 @@ export default function ViewCaseModal({ open, onClose, onView, ryc, onUpdate }) 
           <TextField value={titulo} onChange={(e) => setTitle(e.target.value)} fullWidth />
 
           <LabelConTooltip texto="Descripción del caso" ayuda="Narración completa del caso: contexto empresarial, antecedentes, datos relevantes y la situación problemática que los estudiantes deben resolver." />
-          <TextField value={descripcion} onChange={(e) => setDescription(e.target.value)} fullWidth multiline minRows={5} slotProps={{ htmlInput: { maxLength: 20000 } }} />
+          <TextField value={descripcion} onChange={(e) => setDescription(e.target.value)} fullWidth multiline minRows={5} slotProps={{ htmlInput: { maxLength: 200000 } }} />
 
           <LabelConTooltip texto="Título de la rúbrica" ayuda="Nombre que identifica la rúbrica de evaluación asociada a este caso." />
           <TextField value={tituloRubrica} onChange={(e) => setTituloRubrica(e.target.value)} fullWidth />
