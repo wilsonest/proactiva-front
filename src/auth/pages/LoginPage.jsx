@@ -3,7 +3,7 @@ import { UserContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { Alert, Snackbar } from "@mui/material";
 import SignUp from "../components/SignUp";
-import logo from "../../images/logo.png";
+import logo from "../../images/logo.png";                    
 
 const leftPanelStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
@@ -65,11 +65,10 @@ export function LoginPage() {
 
   const handleLogin = async () => {
     setError("");
-    // Validar dominio antes de llamar al backend
     const correo = email.toLowerCase().trim();
     if (!correo.endsWith("@tdea.edu.co") && !correo.endsWith("@correo.tdea.edu.co")) {
       setError("Solo se permiten correos institucionales @tdea.edu.co o @correo.tdea.edu.co");
-      return; // No llama al backend
+      return;
     }
     setLoading(true);
     const isLogged = await login({ email, password });
