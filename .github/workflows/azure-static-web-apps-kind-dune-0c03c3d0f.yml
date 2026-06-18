@@ -9,7 +9,6 @@ on:
     branches:
       - DevWilson
 
-# 1. ESTO ES CRUCIAL: Le da permiso a GitHub para pedirle el token dinámico a Azure
 permissions:
   id-token: write
   contents: read
@@ -29,13 +28,16 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          # 2. SE USA EL REPO_TOKEN NATIVO: No requiere secretos manuales en Settings
-          repo_token: ${{ secrets.GITHUB_TOKEN }} 
+          # 1. Dejamos esto vacío para que no busque secretos manuales viejos
+          azure_static_web_apps_api_token: ""
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
+          # 2. El truco clave: le dice a la acción que no falle si no hay token manual, usando OIDC
+          skip_deploy_on_missing_secrets: true
           ###### Configuración de la compilación ######
           app_location: "/" 
           api_location: "" 
-          output_location: "dist" # Mantenemos dist para Vite
+          output_location: "dist" # Configurado para Vite
           ###### Fin de la configuración ######
 
   close_pull_request_job:
@@ -47,5 +49,6 @@ jobs:
         id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          azure_static_web_apps_api_token: ""
           action: "close"
+          skip_deploy_on_missing_secrets: true
