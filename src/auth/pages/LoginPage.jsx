@@ -3,6 +3,7 @@ import { UserContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { Alert, Snackbar } from "@mui/material";
 import SignUp from "../components/SignUp";
+import logo from "../../images/logo.png";
 
 const leftPanelStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
@@ -97,7 +98,8 @@ export function LoginPage() {
             <div>
               <div className="logo-box">
                 <img
-                  src="https://www.tdea.edu.co/images/tdea/logo-tdea.png"
+                  // src="https://www.tdea.edu.co/images/tdea/logo-tdea.png"
+                  src={logo}
                   alt="Tecnológico de Antioquia"
                   onError={e => { e.target.style.display='none'; }}
                 />
