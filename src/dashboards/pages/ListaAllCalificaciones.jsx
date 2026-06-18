@@ -70,6 +70,7 @@ export default function ListaAllCalificaciones() {
     try {
       const token = JSON.parse(localStorage.getItem("Token"));
       const detalle = await getEvaluacionDetalle(token.access_token, ev.id);
+      const entrega = await getEntregasById(token.access_token, ev.entrega_id);
       setSelectedEval({
         ...detalle,
         id: ev.id,
@@ -77,6 +78,8 @@ export default function ListaAllCalificaciones() {
         estudiante: ev.estudiante_nombre || ev.entrega_id,
         caso: ev.caso_titulo || "—",
         nota_total: ev.nota_total,
+        respuesta: entrega?.respuesta || "",
+        url_archivo: entrega?.url_archivo || null,
       });
       setOpenReview(true);
     } catch (e) {
