@@ -9,10 +9,6 @@ on:
     branches:
       - DevWilson
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
@@ -23,20 +19,19 @@ jobs:
         with:
           submodules: true
           lfs: false
-
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          # Dejamos la línea declarada para engañar a la validación estricta de la acción
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          # Usamos la variable general para que busque el secreto en tu GitHub
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_KIND_DUNE_0C03C3D0F }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           action: "upload"
-          ###### Configuración de la compilación ######
-          app_location: "/" 
-          api_location: "" 
-          output_location: "dist" 
-          ###### Fin de la configuración ######
+          ###### Repository/Build Configurations ######
+          app_location: "/" # App source code path
+          api_location: "" # Api source code path - optional
+          output_location: "dist" # Configurado para Vite
+          ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -47,5 +42,5 @@ jobs:
         id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_KIND_DUNE_0C03C3D0F }}
           action: "close"
