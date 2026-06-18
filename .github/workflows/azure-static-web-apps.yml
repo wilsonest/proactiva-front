@@ -28,12 +28,14 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
+          # Dejamos la línea declarada para engañar a la validación estricta de la acción
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           ###### Configuración de la compilación ######
           app_location: "/" 
           api_location: "" 
-          output_location: "dist" # Configurado correctamente para Vite
+          output_location: "dist" 
           ###### Fin de la configuración ######
 
   close_pull_request_job:
@@ -43,6 +45,7 @@ jobs:
     steps:
       - name: Close Pull Request
         id: closepullrequest
-        uses: Azure/azure-static-web-apps-deploy@v1
+        uses: Azure/static-web-apps-deploy@v1
         with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "close"
