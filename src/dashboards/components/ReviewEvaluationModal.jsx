@@ -97,7 +97,26 @@ export default function ReviewEvaluationModal({ open, onClose, evaluacion, onCon
             Nota recalculada: <strong style={{ color: "darkgreen", fontSize: "1.1rem" }}>{calcularNota()}</strong>
           </Typography>
         </Box>
-
+        {/* Respuesta del estudiante */}
+        {evaluacion.respuesta && (
+        <Box sx={{ mb: 2, p: 1.5, background: "#fff8e1", borderRadius: 2, border: "1px solid #ffe082" }}>
+        <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1, color: "#e65100" }}>
+          Respuesta del estudiante
+        </Typography>
+        <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", lineHeight: 1.7 }}>
+          {evaluacion.respuesta}
+        </Typography>
+          {evaluacion.url_archivo && (
+          <Box sx={{ mt: 1 }}>
+            <Typography variant="body2" color="text.secondary">Enlace adjunto:</Typography>
+            <a href={evaluacion.url_archivo} target="_blank" rel="noopener noreferrer"
+              style={{ color: "#1a5c2a", wordBreak: "break-all", fontSize: "0.85rem" }}>
+              {evaluacion.url_archivo}
+            </a>
+          </Box>
+          )}
+        </Box>
+)}
         <Divider sx={{ mb: 2 }} />
 
         {/* Criterios editables */}
@@ -126,6 +145,7 @@ export default function ReviewEvaluationModal({ open, onClose, evaluacion, onCon
                   />
                 </Box>
               </Box>
+              
               <TextField
                 label="Comentario del criterio"
                 value={c.comentario_text || ""}

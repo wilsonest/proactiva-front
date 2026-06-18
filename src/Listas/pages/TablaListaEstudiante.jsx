@@ -33,6 +33,7 @@ const columns = [
   { id: "titulo", label: "Caso", minWidth: 170 },
   { id: "estado", label: "Estado", minWidth: 100 },
   { id: "nota", label: "Nota", minWidth: 170 },
+  { id: "retroalimentacion", label: "Retroalimentación", minWidth: 500 },
 ];
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
@@ -107,7 +108,16 @@ export default function ListaEstudiante() {
           return {
             titulo: caso?.titulo ?? "Sin título",
             estado: evaluacion?.estado ?? "Sin evaluar",
-            nota: evaluacion?.nota_total ?? "-",
+            nota: evaluacion?.estado === "final" 
+              ? evaluacion?.nota_total 
+              : evaluacion?.estado === "revisada" 
+                ? "En revisión" 
+                : "-",
+            retroalimentacion: evaluacion?.estado === "final"
+              ? evaluacion?.observaciones_text
+              : evaluacion?.estado === "revisada"
+              ? "Evaluación pendiente de confirmación por el docente"
+              : "Sin retroalimentación",
           };
         }),
       );

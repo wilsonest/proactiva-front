@@ -311,8 +311,8 @@ async function updateCaso(data) {
       {/* Contenido principal: Casos */}
       <Main open={open}>
         <Toolbar />
-        <Box sx={{ maxWidth: 900, margin: "0 auto", mt: 4 }}>
-          <Box sx={{ mb: 3 }}>
+        <Box sx={{ maxWidth: 960, margin: "0 auto", mt: 1 }}>
+          <Box sx={{ mb: 1.5 }}>
             <h2 style={{ color: "black", marginBottom: 8 }}>Tablero de Casos</h2>
             {/* Input de búsqueda */}
             <input
@@ -347,16 +347,19 @@ async function updateCaso(data) {
                   sx={{
                     flex: "1 1 40%",
                     minWidth: 250,
-                    p: 2,
+                    p: 1.5,
                     border: "1px solid #e0e0e0",
                     borderRadius: 2,
                     background: "#fff",
-                    borderColor: "darkgreen",
-                    borderWidth: "2px"
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    minHeight: 110,
+                    maxHeight: 140,
                   }}
                 >
-                  <h3>{caseItem.titulo}</h3>
-                  <p>{caseItem.descripcion.slice(0, 40)} ...</p>
+                  <h3 style={{ margin: "0 0 4px", fontSize: "0.95rem", lineHeight: 1.3 }}>{caseItem.titulo}</h3>
+                  <p style={{ margin: "0 0 8px", fontSize: "0.82rem", color: "#666" }}>{caseItem.descripcion.slice(0, 60)}{caseItem.descripcion.length > 60 ? "..." : ""}</p>
                   <button
                     style={{
                       padding: "6px 16px",
