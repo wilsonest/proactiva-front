@@ -277,9 +277,7 @@ export default function ProfesoresTable() {
                           const value = row[column.id];
                           return (
                             <TableCell key={column.id} align={column.align}>
-                              {column.format && typeof value === "text"
-                                ? column.format(value)
-                                : value}
+                              {column.format && typeof value === "text" ? column.format(value) : value}
                             </TableCell>
                           );
                         })}
